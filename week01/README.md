@@ -45,4 +45,6 @@ to `output.png`.
 | `w`       | `0.2` | Angular velocity |
 | `dt`      | `0.1` | Time step |
 
+## Example Output
 
+![Robot Path](output.png)

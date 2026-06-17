@@ -46,13 +46,13 @@ python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0.2 --dt 0.1 --s
 ## Example Scenarios
 
 ### Straight motion ($w = 0$)
-bash
+```bash
 python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0 --dt 0.1 --steps 100 --out straight.png
-
+```
 ### Gentle turn ($w = 0.2$)
-bash
+```bash
 python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0.2 --dt 0.1 --steps 100 --out gentle_turn.png
-
+```
 ### Sharp turn ($w = 0.5$)
 ```bash
 python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0.5 --dt 0.1 --steps 100 --out sharp_turn.png

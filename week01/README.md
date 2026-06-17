@@ -2,10 +2,10 @@
 
 ## What is this project?
 
-This project simulates the motion of a robot in a 2D plane.
+This project simulates the motion of a differential drive robot in a 2D plane.
 The robot moves with a given linear velocity and angular velocity, and at
 each time step its new position is computed. At the end, the full
-trajectory is plotted using `matplotlib` and saved to `output.png`.
+trajectory is plotted using `matplotlib` and saved as an image.
 
 ## Robot Motion Equations
 
@@ -25,26 +25,36 @@ $$\theta_{new} = \theta + w \cdot dt$$
 ```bash
 pip install matplotlib
 ```
-
-2. Run the program:
+2. Run the program with custom parameters:
 
 ```bash
-python differential_motion.py
+python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0.2 --dt 0.1 --steps 100 --out trajectory.png
 ```
+## Command-line Parameters
 
-After running, the robot's trajectory is computed and the plot is saved
-to `output.png`.
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--x`     | `0`     | Initial x position |
+| `--y`     | `0`     | Initial y position |
+| `--theta` | `0`     | Initial heading (radians) |
+| `--v`     | `0.5`   | Linear velocity |
+| `--w`     | `0.2`   | Angular velocity |
+| `--dt`    | `0.1`   | Time step |
+| `--steps` | `100`   | Number of simulation steps |
+| `--out`   | `output.png` | Output filename |
 
-## Default Parameters
+## Example Scenarios
 
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `x`, `y`  | `0`   | Initial position |
-| `theta`   | `0`   | Initial heading (radians) |
-| `v`       | `0.5` | Linear velocity |
-| `w`       | `0.2` | Angular velocity |
-| `dt`      | `0.1` | Time step |
+### Straight motion ($w = 0$)
+bash
+python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0 --dt 0.1 --steps 100 --out straight.png
 
-## Example Output
+### Gentle turn ($w = 0.2$)
+bash
+python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0.2 --dt 0.1 --steps 100 --out gentle_turn.png
 
-![Robot Path](output.png)
+### Sharp turn ($w = 0.5$)
+```bash
+python differential_motion.py --x 0 --y 0 --theta 0 --v 0.5 --w 0.5 --dt 0.1 --steps 100 --out sharp_turn.png
+```
+The turning radius is given by $r = v/w$. Higher $w$ produces tighter curves.

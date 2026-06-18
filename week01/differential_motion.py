@@ -31,20 +31,35 @@ def compute_total_distance(path):
 def plot_path(path, output):
     x_vals = [p[0] for p in path]
     y_vals = [p[1] for p in path]
+    fx, fy, ftheta = path[-1]
 
     plt.figure(figsize=(8, 6))
     plt.plot(x_vals, y_vals, 'b-', linewidth=2, label='robot path')
-    plt.scatter(x_vals[0], y_vals[0], color='green', label='start point', zorder=5)
-    plt.scatter(x_vals[-1], y_vals[-1], color='red', label='end point', zorder=5)
-    plt.xlabel('X', fontsize=12)
-    plt.ylabel('Y', fontsize=12)
+    plt.scatter(x_vals[0], y_vals[0], s=100, color='green', label='start', zorder=5)
+    plt.scatter(fx, fy, color='red', s=100, label='end', zorder=5)
+    
+    arrow_length = 0.3
+    dx = arrow_length * math.cos(ftheta)
+    dy = arrow_length * math.sin(ftheta)
+    plt.arrow(fx, fy, dx, dy, head_width=0.15, head_length=0.1, fc='darkred', ec='darkred', linewidth=2, zorder=6) 
+    
+    plt.xlabel('X (m)', fontsize=12)
+    plt.ylabel('Y (m)', fontsize=12)
     plt.title('Robot path', fontsize=14)
     plt.legend()
     plt.grid(True)
     plt.axis('equal')
-    plt.savefig(output, dpi=150)
+    plt.savefig(output, dpi=150, bbox_inches='tight')
     plt.close()
 
+
+def generate_output_filename(w):
+    if w == 0:
+        return "output_straight.png"
+    elif abs(w) <=0.3:
+        return "output_curve.png"
+    else:
+        return "output.png"
 
 
 def main():
@@ -57,10 +72,14 @@ def main():
     parser.add_argument("--v", type=float, default=0.5, help="Linear velocity of the robot in m/s")
     parser.add_argument("--w", type=float, default=0.2, help="Angular velocity of the robot in rad/s")
     parser.add_argument("--steps", type=int, default=100, help="Number of simulation steps")
-    parser.add_argument("--out", type=str, default="output.png", help="Output image file name")
+    parser.add_argument("--out", type=str, default=None, help="Output image file name")
 
 
     args = parser.parse_args()
+
+    if args.out is None:
+        args.out = generate_output_filename(args.w)
+
 
     path, final_pose = simulate_motion(args.x, args.y, args.theta, args.dt, args.v, args.w, args.steps)
     plot_path(path, args.out)

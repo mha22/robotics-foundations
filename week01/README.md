@@ -80,3 +80,7 @@ The turning radius is given by $r = v/w$. Higher $w$ produces tighter curves.
 - وقتی $w = 0$ باشد، مسیر مستقیم است.
 - هرچه $w$ بیشتر شود، انحنای مسیر بیشتر می‌شود.
 - $v$ تعیین می‌کند ربات در هر گام چه‌قدر جلو برود.
+
+## Sample Output
+
+![Robot Path](output.png)

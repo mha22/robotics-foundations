@@ -19,6 +19,15 @@ def simulate_motion(x, y, theta, dt, v, w, steps):
     return path, final_pose
 
 
+def compute_total_distance(path):
+    total = 0
+    for i in range(0, len(path) - 1):
+        x0, y0, _ = path[i]
+        x1, y1, _ = path[i + 1]
+        total += math.hypot(x1 - x0, y1 - y0)
+    return total
+
+
 def plot_path(path, output):
     x_vals = [p[0] for p in path]
     y_vals = [p[1] for p in path]
@@ -60,8 +69,14 @@ def main():
     plot_path(path, args.out)
 
     fx, fy, ftheta = final_pose
-    print(f"saved, final pose: x={fx:.3f}, y={fy:.3f}, theta={ftheta:.3f}")
 
+    total_time = args.dt * args.steps
+    total_distance = compute_total_distance(path)
+    final_heading  = ftheta
+
+    print(f"Final pose: x={fx:.3f}, y={fy:.3f}, theta={ftheta:.3f}")
+    print(f"Total distance traveled: {total_distance:.3f} m")
+    print(f"Final heading: {math.degrees(final_heading):.3f} deg")
 
 if __name__ == "__main__":
     main()

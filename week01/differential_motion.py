@@ -46,11 +46,8 @@ def plot_path(path, output):
     plt.close()
 
 
+
 def main():
-    # x, y, theta = 0, 0, 0
-    # v, w = 0.5, 0.2
-    # dt = 0.1
-    # steps = 100
     parser = argparse.ArgumentParser(description="Basic differential drive motion simulation")
 
     parser.add_argument("--x", type=float, default=0, help="Initial x position of the robot")
@@ -77,6 +74,7 @@ def main():
     print(f"Final pose: x={fx:.3f}, y={fy:.3f}, theta={ftheta:.3f}")
     print(f"Total distance traveled: {total_distance:.3f} m")
     print(f"Final heading: {math.degrees(final_heading):.3f} deg")
+
 
 if __name__ == "__main__":
     main()

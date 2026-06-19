@@ -54,9 +54,9 @@ def plot_path(path, output):
 
 
 def generate_output_filename(w):
-    if w == 0:
+    if abs(w) < 1e-9:
         return "output_straight.png"
-    elif abs(w) <=0.3:
+    elif abs(w) <= 0.3:
         return "output_curve.png"
     else:
         return "output.png"
@@ -86,7 +86,6 @@ def main():
 
     fx, fy, ftheta = final_pose
 
-    total_time = args.dt * args.steps
     total_distance = compute_total_distance(path)
     final_heading  = ftheta
 

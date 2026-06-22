@@ -16,7 +16,11 @@ int main() {
 
     std::cout << "Final ";
     robot.printPose();
+    std::cout << "Total distance traveled: " <<
+    robot.compute_total_distance() <<
+    " m" << std::endl;
+
+    robot.saveToCsv();
     
     return 0;
 }
-

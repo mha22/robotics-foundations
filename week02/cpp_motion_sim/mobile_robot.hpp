@@ -10,21 +10,26 @@ struct Pose {
 
 
 class MobileRobot {
-    public:
-        MobileRobot(double x, double y, double theta);
+public:
+    MobileRobot(double x, double y, double theta);
 
-        void move(double v, double w, double dt);
+    void move(double v, double w, double dt);
 
-        void printPose() const;
+    void printPose() const;
     
 
-        Pose getPose() const;
+    Pose getPose() const;
         
-        const std::vector<Pose>& getPath() const;
+    const std::vector<Pose>& getPath() const;
 
-    private:
-        double x_;
-        double y_;
-        double theta_;
-        std::vector<Pose> path_; 
+    double compute_total_distance() const;
+
+    void saveToCsv() const;
+
+
+private:
+    double x_;
+    double y_;
+    double theta_;
+    std::vector<Pose> path_; 
 };

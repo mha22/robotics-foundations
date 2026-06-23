@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 struct Pose {
     double x;
@@ -15,16 +16,16 @@ public:
 
     void move(double v, double w, double dt);
 
-    void printPose() const;
+    void print_pose() const;
     
 
-    Pose getPose() const;
+    Pose get_pose() const;
         
-    const std::vector<Pose>& getPath() const;
+    const std::vector<Pose>& get_path() const;
 
     double compute_total_distance() const;
 
-    void saveToCsv() const;
+    void save_to_csv(const std::string& filename) const;
 
 
 private:

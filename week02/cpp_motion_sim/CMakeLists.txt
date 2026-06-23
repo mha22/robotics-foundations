@@ -8,7 +8,7 @@ project(
 )
 
 
-add_executable(motion_sim main.cpp mobile_robot.cpp)
+add_executable(motion_sim main.cpp robot.cpp)
 
 target_compile_features(motion_sim PRIVATE cxx_std_17)
 

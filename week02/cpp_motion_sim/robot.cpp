@@ -1,4 +1,4 @@
-#include "mobile_robot.hpp"
+#include "robot.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -19,21 +19,25 @@ void MobileRobot::move(double v, double w, double dt) {
     path_.push_back({x_, y_, theta_});
 }
 
-void MobileRobot::printPose() const {
+void MobileRobot::print_pose() const {
     std::cout << "pose: x=" << x_
     << ", y=" << y_ << ", theta=" << theta_
     << std::endl;
 }
 
-Pose MobileRobot::getPose() const {
+Pose MobileRobot::get_pose() const {
     return {x_, y_, theta_};
 }
 
-const std::vector<Pose>& MobileRobot::getPath() const {
+const std::vector<Pose>& MobileRobot::get_path() const {
     return path_;
 }
 
 double MobileRobot::compute_total_distance() const {
+    if (path_.size() < 2) {
+        return 0.0;
+    }
+
     double total = 0;
     double x0, y0, x1, y1, dx, dy;
     for (size_t i=0; i < path_.size() - 1; i++) {
@@ -51,8 +55,13 @@ double MobileRobot::compute_total_distance() const {
     return total;
 }
 
-void MobileRobot::saveToCsv() const {
-    std::ofstream file("path.csv");
+void MobileRobot::save_to_csv(const std::string& filename) const {
+    std::ofstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << " for writing." << std::endl;
+        return;
+    }
 
     file << "step,x,y,theta\n";
 

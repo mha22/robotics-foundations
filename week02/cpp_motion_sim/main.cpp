@@ -1,4 +1,4 @@
-#include "mobile_robot.hpp"
+#include "robot.hpp"
 
 #include <iostream>
 #include <string>
@@ -27,12 +27,12 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "Final ";
-    robot.printPose();
+    robot.print_pose();
     std::cout << "Total distance traveled: " <<
     robot.compute_total_distance() <<
     " m" << std::endl;
 
-    robot.saveToCsv();
+    robot.save_to_csv("path.csv");
     
     return 0;
 }

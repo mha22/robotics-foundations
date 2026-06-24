@@ -3,17 +3,16 @@
 #include <iostream>
 #include <string>
 
+
+
 int main(int argc, char* argv[]) {
-    double v = 0.5;
-    double w = 0.2;
-    double dt = 0.1;
-    int steps = 100;
+    SimulationConfig config{0.5, 0.2, 0.1, 100};
 
     if (argc == 5) {
-        v = std::stod(argv[1]);
-        w = std::stod(argv[2]);
-        dt = std::stod(argv[3]);
-        steps = std::stoi(argv[4]);
+        config.v = std::stod(argv[1]);
+        config.w = std::stod(argv[2]);
+        config.dt = std::stod(argv[3]);
+        config.steps = std::stoi(argv[4]);
     }
     else if (argc != 1) {
         std::cerr << "Usage: " << argv[0] << " <v> <w> <dt> <steps>" << std::endl;
@@ -21,18 +20,7 @@ int main(int argc, char* argv[]) {
     }
 
     MobileRobot robot(0.0, 0.0, 0.0);
+    runSimulation(robot, config);
 
-    for (int i = 0; i < steps; i++) {
-        robot.move(v, w, dt);
-    }
-
-    std::cout << "Final ";
-    robot.print_pose();
-    std::cout << "Total distance traveled: " <<
-    robot.compute_total_distance() <<
-    " m" << std::endl;
-
-    robot.save_to_csv("path.csv");
-    
     return 0;
 }

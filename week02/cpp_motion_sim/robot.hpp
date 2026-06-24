@@ -9,6 +9,12 @@ struct Pose {
     double theta;
 };
 
+struct SimulationConfig  {
+    double v;
+    double w;
+    double dt;
+    int steps;
+};
 
 class MobileRobot {
 public:
@@ -34,3 +40,6 @@ private:
     double theta_;
     std::vector<Pose> path_; 
 };
+
+
+void runSimulation(MobileRobot& robot, const SimulationConfig& config);

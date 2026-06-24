@@ -74,3 +74,18 @@ void MobileRobot::save_to_csv(const std::string& filename) const {
 
     file.close();
 }
+
+
+void runSimulation(MobileRobot& robot, const SimulationConfig& config) {
+    for (int i = 0; i < config.steps; i++) {
+        robot.move(config.v, config.w, config.dt);
+    }
+
+    std::cout << "Final ";
+    robot.print_pose();
+    std::cout << "Total distance traveled: " <<
+    robot.compute_total_distance() <<
+    " m" << std::endl;
+
+    robot.save_to_csv("path.csv");
+}

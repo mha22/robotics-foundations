@@ -3,10 +3,20 @@
 #include <vector>
 #include <string>
 
+struct WheelCommand {
+    double omega_left;
+    double omega_right;
+};
+
 struct Pose {
     double x;
     double y;
     double theta;
+};
+
+struct RobotGeometry {
+    double wheel_radius;
+    double wheel_base;
 };
 
 struct SimulationConfig  {
@@ -16,14 +26,24 @@ struct SimulationConfig  {
     int steps;
 };
 
+struct WheelSimulationConfig {
+    double omega_left;
+    double omega_right;
+    double dt;
+    int steps;
+};
+
+
 class MobileRobot {
 public:
     MobileRobot(double x, double y, double theta);
+    MobileRobot(double x, double y, double theta, const RobotGeometry& geometry);
 
     void move(double v, double w, double dt);
 
+    void moveFromWheelSpeeds(double omega_left, double omega_right,  double dt);
+
     void print_pose() const;
-    
 
     Pose get_pose() const;
         
@@ -38,8 +58,10 @@ private:
     double x_;
     double y_;
     double theta_;
+    RobotGeometry geometry_;
     std::vector<Pose> path_; 
 };
 
 
 void runSimulation(MobileRobot& robot, const SimulationConfig& config);
+void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config);

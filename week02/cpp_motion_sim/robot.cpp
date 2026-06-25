@@ -7,8 +7,19 @@
 MobileRobot::MobileRobot(double x, double y, double theta) 
     : x_(x),
     y_(y),
-    theta_(theta) 
-    {path_.push_back({x_, y_, theta_});
+    theta_(theta),
+    geometry_{0.05, 0.3}
+{
+    path_.push_back({x_, y_, theta_});
+}
+
+MobileRobot::MobileRobot(double x, double y, double theta, const RobotGeometry& geometry) 
+    : x_(x),
+    y_(y),
+    theta_(theta),
+    geometry_(geometry)
+{
+    path_.push_back({x_, y_, theta_});
 }
 
 void MobileRobot::move(double v, double w, double dt) {
@@ -17,6 +28,13 @@ void MobileRobot::move(double v, double w, double dt) {
     theta_ = theta_ + w * dt;
 
     path_.push_back({x_, y_, theta_});
+}
+
+void MobileRobot::moveFromWheelSpeeds(double omega_left, double omega_right, double dt) {
+    double v = geometry_.wheel_radius * (omega_right + omega_left) / 2.0;
+    double w = geometry_.wheel_radius * (omega_right - omega_left) / geometry_.wheel_base;
+
+    move(v, w, dt);
 }
 
 void MobileRobot::print_pose() const {
@@ -88,4 +106,19 @@ void runSimulation(MobileRobot& robot, const SimulationConfig& config) {
     " m" << std::endl;
 
     robot.save_to_csv("path.csv");
+}
+
+
+void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config) {
+    for (int i = 0; i < config.steps; i++) {
+        robot.moveFromWheelSpeeds(config.omega_left, config.omega_right, config.dt);
+    }
+
+    std::cout << "Final ";
+    robot.print_pose();
+    std::cout << "Total distance traveled: " <<
+    robot.compute_total_distance() <<
+    " m" << std::endl;
+
+    robot.save_to_csv("path_wheel.csv");
 }

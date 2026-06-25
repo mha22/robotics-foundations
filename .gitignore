@@ -1,4 +1,6 @@
 *.png
+
 build/
 __pycache__/
 path.csv
+path_wheel.csv

@@ -13,7 +13,10 @@ The simulation tracks the robot's pose (`x`, `y`, `theta`), calculates the total
 ## Build
 To compile the project, you can use any standard C++ compiler like `g++`. Run the following command in your terminal:
 ```bash
-g++ main.cpp robot.cpp -o motion_sim
+mkdir -p build
+cd build
+cmake ..
+cmake --build .
 ```
 ## Run
 You can run the program in three ways.
@@ -48,14 +51,14 @@ dt = 0.1
 steps = 100
 ```
 ### 3. Differential drive mode (wheel speeds)
-Run with wheel speeds and wheel radius from the command line:
+Run with wheel speeds, wheel radius, and wheel base from the command line:
 
 ```bash
-./motion_sim <omega_left> <omega_right> <dt> <steps> <wheel_radius>
+./motion_sim <omega_left> <omega_right> <dt> <steps> <wheel_radius> <wheel_base>
 ```
 Example:
 ```bash
-./motion_sim 5 10 0.1 100 0.05
+./motion_sim 5 10 0.1 100 0.05 0.3
 ```
 This means:
 ```text
@@ -64,7 +67,7 @@ omega_right  = 10
 dt           = 0.1
 steps        = 100
 wheel_radius = 0.05
-wheel_base   = 0.3   (fixed default)
+wheel_base   = 0.3  
 ```
 ## Output
 When you run the program, it does the following:

@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
         runSimulation(robot, config);
 
     }
-    else if (argc == 6) {
+    else if (argc == 7) {
         WheelSimulationConfig config{
         std::stod(argv[1]),
         std::stod(argv[2]),
@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
         };
 
         RobotGeometry geometry{
-            std::stod(argv[5]),     // wheel_radius (optional)
-            0.3                     // wheel_base default
+            std::stod(argv[5]),     // wheel_radius 
+            std::stod(argv[6])
         };
 
         MobileRobot robot(0.0, 0.0, 0.0, geometry);
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage:" << std::endl;
         std::cerr << "  " << argv[0] << " (run default tests)" << std::endl;
         std::cerr << "  " << argv[0] << " <v> <w> <dt> <steps> (unicycle mode)" << std::endl;
-        std::cerr << "  " << argv[0] << " <omega_l> <omega_r> <dt> <steps> <wheel_r> (differential drive)" << std::endl;
+        std::cerr << "  " << argv[0] << " <omega_l> <omega_r> <dt> <steps> <wheel_r> <wheel_base> (differential drive)" << std::endl;
         return 1;
     }
 

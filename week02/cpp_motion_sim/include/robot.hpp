@@ -41,7 +41,7 @@ public:
 
     void move(double v, double w, double dt);
 
-    void moveFromWheelSpeeds(double omega_left, double omega_right,  double dt);
+    void moveFromWheelSpeeds(const WheelCommand& cmd,  double dt);
 
     void print_pose() const;
 

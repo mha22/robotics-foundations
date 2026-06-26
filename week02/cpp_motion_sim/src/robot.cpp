@@ -30,9 +30,9 @@ void MobileRobot::move(double v, double w, double dt) {
     path_.push_back({x_, y_, theta_});
 }
 
-void MobileRobot::moveFromWheelSpeeds(double omega_left, double omega_right, double dt) {
-    double v = geometry_.wheel_radius * (omega_right + omega_left) / 2.0;
-    double w = geometry_.wheel_radius * (omega_right - omega_left) / geometry_.wheel_base;
+void MobileRobot::moveFromWheelSpeeds(const WheelCommand& cmd, double dt) {
+    double v = geometry_.wheel_radius * (cmd.omega_right + cmd.omega_left) / 2.0;
+    double w = geometry_.wheel_radius * (cmd.omega_right - cmd.omega_left) / geometry_.wheel_base;
 
     move(v, w, dt);
 }
@@ -111,7 +111,7 @@ void runSimulation(MobileRobot& robot, const SimulationConfig& config) {
 
 void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config) {
     for (int i = 0; i < config.steps; i++) {
-        robot.moveFromWheelSpeeds(config.omega_left, config.omega_right, config.dt);
+        robot.moveFromWheelSpeeds({config.omega_left, config.omega_right}, config.dt);
     }
 
     std::cout << "Final ";

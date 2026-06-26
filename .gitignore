@@ -4,3 +4,6 @@ build/
 __pycache__/
 path.csv
 path_wheel.csv
+path_wheel_arc.csv
+path_wheel_rotate.csv
+path_wheel_straight.csv

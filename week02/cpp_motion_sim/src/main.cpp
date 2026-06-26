@@ -9,15 +9,15 @@ int main(int argc, char* argv[]) {
     if (argc == 1) {
         std::cout << "===== Test 1: omega_left = omega_right (straight) ====="  << std::endl;
         MobileRobot robot1(0.0, 0.0, 0.0);
-        runWheelSimulation(robot1, {10.0, 10.0, 0.1, 100});
+        runWheelSimulation(robot1, {{10.0, 10.0}, 0.1, 100}, "path_wheel_straight.csv");
 
         std::cout << "\n==== Test 2: omega_left = -omega_right (rotate in place) ====="  << std::endl;
         MobileRobot robot2(0.0, 0.0, 0.0);
-        runWheelSimulation(robot2, {-5.0, 5.0, 0.1, 100});     
+        runWheelSimulation(robot2, {{-5.0, 5.0}, 0.1, 100}, "path_wheel_rotate.csv");     
 
         std::cout << "\n===== Test 3: omega_right > omega_left (arc) ====="  << std::endl;
         MobileRobot robot3 (0.0, 0.0, 0.0);
-        runWheelSimulation(robot3, {5.0, 10.0, 0.1, 100});
+        runWheelSimulation(robot3, {{5.0, 10.0}, 0.1, 100}, "path_wheel_arc.csv");
     }
     else if (argc == 5) {
         SimulationConfig config{
@@ -32,21 +32,18 @@ int main(int argc, char* argv[]) {
     }
     else if (argc == 7) {
         WheelSimulationConfig config{
-        std::stod(argv[1]),
-        std::stod(argv[2]),
+        {std::stod(argv[1]), std::stod(argv[2])},
         std::stod(argv[3]),
         std::stoi(argv[4])
         };
 
         RobotGeometry geometry{
-            std::stod(argv[5]),     // wheel_radius 
+            std::stod(argv[5]),    
             std::stod(argv[6])
         };
 
         MobileRobot robot(0.0, 0.0, 0.0, geometry);
-        runWheelSimulation(robot, config);
-
-
+        runWheelSimulation(robot, config, "path_wheel.csv");
     }
 
     else {

@@ -10,14 +10,19 @@ w = wheel_radius * (omega_right - omega_left) / wheel_base
 ```
 The simulation tracks the robot's pose (`x`, `y`, `theta`), calculates the total distance traveled, and exports the entire trajectory to a CSV file for further analysis or plotting. This design brings the model conceptually closer to a real robot and prepares it for ROS 2 and motor control.
 
+---
+
 ## Build
-To compile the project, you can use any standard C++ compiler like `g++`. Run the following command in your terminal:
+This project uses **CMake**.
+
 ```bash
 mkdir -p build
 cd build
 cmake ..
 cmake --build .
 ```
+---
+
 ## Run
 You can run the program in three ways.
 
@@ -27,6 +32,13 @@ Running without arguments executes three built-in test scenarios that validate t
 ```bash
 ./motion_sim
 ```
+
+If you are running from the project root instead of the `build/` directory, use:
+
+```bash
+./build/motion_sim
+```
+
 | Test | Wheel speeds | Expected behavior |
 |------|--------------|-------------------|
 | 1    | `omega_left = omega_right` (10, 10)  | moves (nearly) straight |
@@ -39,16 +51,26 @@ Run with custom velocity parameters from the command line:
 ```bash
 ./motion_sim <v> <w> <dt> <steps>
 ```
+
 Example:
+
 ```bash
 ./motion_sim 0.5 0.2 0.1 100
 ```
+
 This means:
+
 ```text
 v = 0.5
 w = 0.2
 dt = 0.1
 steps = 100
+```
+
+If running from the project root:
+
+```bash
+./build/motion_sim 0.5 0.2 0.1 100
 ```
 ### 3. Differential drive mode (wheel speeds)
 Run with wheel speeds, wheel radius, and wheel base from the command line:
@@ -56,32 +78,53 @@ Run with wheel speeds, wheel radius, and wheel base from the command line:
 ```bash
 ./motion_sim <omega_left> <omega_right> <dt> <steps> <wheel_radius> <wheel_base>
 ```
+
 Example:
+
 ```bash
 ./motion_sim 5 10 0.1 100 0.05 0.3
 ```
+
 This means:
+
 ```text
 omega_left   = 5
 omega_right  = 10
 dt           = 0.1
 steps        = 100
 wheel_radius = 0.05
-wheel_base   = 0.3  
+wheel_base   = 0.3
 ```
+If running from the project root:
+
+```bash
+./build/motion_sim 5 10 0.1 100 0.05 0.3
+```
+---
+
 ## Output
 When you run the program, it does the following:
 
 1. Simulates the robot motion using the selected mode.
-2. Prints the final pose (`x`, `y`, `theta`) of the robot to the console.
+2. Prints the final pose (`x`, `y`, `theta`) to the console.
 3. Prints the total distance traveled.
-4. Generates a trajectory CSV file in the same directory:
-   - Unicycle mode → `path.csv`
-   - Differential drive mode → `path_wheel.csv`
+4. Generates a trajectory CSV file.
+
+### CSV files by mode
+- **Unicycle mode**
+  - `path.csv`
+
+- **Differential drive mode (custom CLI run)**
+  - `path_wheel.csv`
+
+- **Default test mode**
+  - `path_wheel_straight.csv`
+  - `path_wheel_rotate.csv`
+  - `path_wheel_arc.csv`
 
 **Example Console Output:**
 ```text
-Final pose: x=2.30857, y=3.51752, theta=2
+Final pose: x=2.30857, y=3.51752, theta=2 rad (114.592 deg)
 Total distance traveled: 5 m
 ```
 **Example CSV Content:**
@@ -92,7 +135,10 @@ step,x,y,theta
 2,0.09999,0.001,0.04
 ...
 ```
+---
+
 ## Key Data Structures
+
 ```cpp
 struct WheelCommand {
 double omega_left;
@@ -103,7 +149,15 @@ struct RobotGeometry {
 double wheel_radius;
 double wheel_base;
 };
+
+struct WheelSimulationConfig {
+WheelCommand command;
+double dt;
+int steps;
+};
 ```
+---
+
 ## Concepts Practiced
 - C++ struct
 - C++ class
@@ -113,3 +167,4 @@ double wheel_base;
 - command-line arguments with `argc` and `argv`
 - unicycle motion model
 - differential drive kinematics
+- basic file export to CSV

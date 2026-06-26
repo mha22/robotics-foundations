@@ -27,8 +27,7 @@ struct SimulationConfig  {
 };
 
 struct WheelSimulationConfig {
-    double omega_left;
-    double omega_right;
+    WheelCommand command;
     double dt;
     int steps;
 };
@@ -41,7 +40,7 @@ public:
 
     void move(double v, double w, double dt);
 
-    void moveFromWheelSpeeds(const WheelCommand& cmd,  double dt);
+    void move_from_wheel_speeds(const WheelCommand& cmd,  double dt);
 
     void print_pose() const;
 
@@ -64,4 +63,6 @@ private:
 
 
 void runSimulation(MobileRobot& robot, const SimulationConfig& config);
-void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config);
+void runWheelSimulation(MobileRobot& robot,
+                        const WheelSimulationConfig& config,
+                        const std::string& filename);

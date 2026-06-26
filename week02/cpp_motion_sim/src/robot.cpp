@@ -30,7 +30,7 @@ void MobileRobot::move(double v, double w, double dt) {
     path_.push_back({x_, y_, theta_});
 }
 
-void MobileRobot::moveFromWheelSpeeds(const WheelCommand& cmd, double dt) {
+void MobileRobot::move_from_wheel_speeds(const WheelCommand& cmd, double dt) {
     double v = geometry_.wheel_radius * (cmd.omega_right + cmd.omega_left) / 2.0;
     double w = geometry_.wheel_radius * (cmd.omega_right - cmd.omega_left) / geometry_.wheel_base;
 
@@ -38,9 +38,13 @@ void MobileRobot::moveFromWheelSpeeds(const WheelCommand& cmd, double dt) {
 }
 
 void MobileRobot::print_pose() const {
+    constexpr double rad_to_deg = 180.0 / 3.14159265358979323846;
     std::cout << "pose: x=" << x_
-    << ", y=" << y_ << ", theta=" << theta_
-    << std::endl;
+          << ", y=" << y_
+          << ", theta=" << theta_
+          << " rad"
+          << " (" << theta_ * rad_to_deg << " deg)"
+          << std::endl;
 }
 
 Pose MobileRobot::get_pose() const {
@@ -109,9 +113,9 @@ void runSimulation(MobileRobot& robot, const SimulationConfig& config) {
 }
 
 
-void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config) {
+void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config, const std::string& filename) {
     for (int i = 0; i < config.steps; i++) {
-        robot.moveFromWheelSpeeds({config.omega_left, config.omega_right}, config.dt);
+        robot.move_from_wheel_speeds(config.command, config.dt);
     }
 
     std::cout << "Final ";
@@ -120,5 +124,5 @@ void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config)
     robot.compute_total_distance() <<
     " m" << std::endl;
 
-    robot.save_to_csv("path_wheel.csv");
+    robot.save_to_csv(filename);
 }

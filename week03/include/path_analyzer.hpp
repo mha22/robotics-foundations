@@ -1,0 +1,13 @@
+#pragma once
+
+#include "robot.hpp"
+#include <vector>
+
+class PathAnalyzer {
+public:
+    static double compute_total_distance(const std::vector<Pose>& path);
+    
+    static double compute_net_displacement(const std::vector<Pose>& path);
+
+    static double compute_final_heading_deg(const std::vector<Pose>& path);
+};

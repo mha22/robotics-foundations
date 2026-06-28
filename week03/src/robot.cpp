@@ -56,10 +56,6 @@ const std::vector<Pose>& MobileRobot::get_path() const {
     return path_;
 }
 
-double MobileRobot::compute_total_distance() const {
-    return PathAnalyzer::compute_total_distance(path_);
-}
-
 void MobileRobot::save_to_csv(const std::string& filename) const {
     std::ofstream file(filename);
 
@@ -86,12 +82,7 @@ void runSimulation(MobileRobot& robot, const SimulationConfig& config) {
         robot.move(config.v, config.w, config.dt);
     }
 
-    std::cout << "Final ";
-    robot.print_pose();
-    std::cout << "Total distance traveled: " <<
-    robot.compute_total_distance() <<
-    " m" << std::endl;
-
+    print_simulation_summary(robot);
     robot.save_to_csv("path.csv");
 }
 
@@ -101,11 +92,20 @@ void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config,
         robot.move_from_wheel_speeds(config.command, config.dt);
     }
 
+    print_simulation_summary(robot);
+    robot.save_to_csv(filename);
+}
+
+
+void print_simulation_summary(const MobileRobot& robot) {
     std::cout << "Final ";
     robot.print_pose();
+
     std::cout << "Total distance traveled: " <<
-    robot.compute_total_distance() <<
+    PathAnalyzer::compute_total_distance(robot.get_path()) <<
     " m" << std::endl;
 
-    robot.save_to_csv(filename);
+    std::cout << "Net displacement: " <<
+    PathAnalyzer::compute_net_displacement(robot.get_path()) << 
+    " m" << std::endl;
 }

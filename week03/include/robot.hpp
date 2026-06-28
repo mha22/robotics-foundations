@@ -48,8 +48,6 @@ public:
         
     const std::vector<Pose>& get_path() const;
 
-    double compute_total_distance() const;
-
     void save_to_csv(const std::string& filename) const;
 
 
@@ -63,6 +61,9 @@ private:
 
 
 void runSimulation(MobileRobot& robot, const SimulationConfig& config);
+
 void runWheelSimulation(MobileRobot& robot,
                         const WheelSimulationConfig& config,
                         const std::string& filename);
+
+void print_simulation_summary(const MobileRobot& robot);

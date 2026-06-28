@@ -108,4 +108,8 @@ void print_simulation_summary(const MobileRobot& robot) {
     std::cout << "Net displacement: " <<
     PathAnalyzer::compute_net_displacement(robot.get_path()) << 
     " m" << std::endl;
+
+    std::cout << "Final heading in degrees: " <<
+    PathAnalyzer::compute_final_heading_deg(robot.get_path()) << 
+    " deg" << std::endl;
 }

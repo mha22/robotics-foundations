@@ -23,4 +23,10 @@ target_compile_options(robot_core PRIVATE
 
 add_executable(motion_sim src/main.cpp)
 
+target_compile_options(motion_sim PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
 target_link_libraries(motion_sim PRIVATE robot_core)

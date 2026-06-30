@@ -1,6 +1,16 @@
 #include "path_analyzer.hpp"
 
 #include <cmath>
+#include <stdexcept>
+
+
+double PathAnalyzer::normalize_deg_signed(double deg) {
+    double r = std::fmod(deg + 180.0, 360.0);
+    if (r < 0.0) {
+        r += 360.0;
+    }
+    return r - 180.0;
+}
 
 double PathAnalyzer::compute_total_distance(const std::vector<Pose>& path) {
     if (path.size() < 2) {
@@ -42,7 +52,8 @@ double PathAnalyzer::compute_final_heading_deg(const std::vector<Pose>& path) {
         return 0.0;
     }
     constexpr double rad_to_deg = 180.0 / 3.14159265358979323846;
-    return path.back().theta * rad_to_deg;
+    double deg = path.back().theta * rad_to_deg;
+    return normalize_deg_signed(deg);
 }
 
 double PathAnalyzer::compute_max_distance_from_origin(const std::vector<Pose>& path) {

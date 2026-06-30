@@ -5,6 +5,8 @@
 
 class PathAnalyzer {
 public:
+    static double normalize_deg_signed(double deg);
+
     static double compute_total_distance(const std::vector<Pose>& path);
     
     static double compute_net_displacement(const std::vector<Pose>& path);

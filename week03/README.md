@@ -19,22 +19,18 @@ The simulation tracks the robot's pose (`x`, `y`, `theta`), calculates path metr
 ├── CMakeLists.txt
 ├── README.md
 ├── include/
-│   ├── mobile_robot.hpp
-│   ├── path_analyzer.hpp
-│   └── types.hpp
+│   ├── robot.hpp
+│   └── path_analyzer.hpp
 └── src/
-├── main.cpp
-├── mobile_robot.cpp
-├── path_analyzer.cpp
-└── robot.cpp
-
+    ├── main.cpp
+    ├── path_analyzer.cpp
+    └── robot.cpp
 ```
 
 **Key components:**
-- `types.hpp`: Core data structures (`Pose`, `WheelCommand`, `RobotGeometry`, etc.)
-- `mobile_robot.hpp/cpp`: Robot state and motion models
-- `path_analyzer.hpp/cpp`: Static methods for trajectory analysis (distance, displacement, heading)
-- `robot.cpp`: Simulation runner and output formatting
+- `robot.hpp`: Core data structures (Pose, WheelCommand, RobotGeometry, etc.) and MobileRobot class declaration
+- `robot.cpp`: MobileRobot implementation, simulation runners, and output formatting
+- `path_analyzer.hpp` / `path_analyzer.cpp`: Static methods for trajectory analysis (distance, displacement, heading)
 - `main.cpp`: Entry point and CLI argument handling
 
 ---
@@ -205,7 +201,15 @@ WheelCommand command;
 double dt;
 int steps;
 };
+
+struct SimulationConfig {
+    double v;
+    double w;
+    double dt;
+    int steps;
+};
 ```
+
 
 ---
 

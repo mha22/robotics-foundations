@@ -19,7 +19,10 @@ MobileRobot::MobileRobot(double x, double y, double theta, const RobotGeometry& 
     y_(y),
     theta_(theta),
     geometry_(geometry)
-{
+{    
+    if (geometry_.wheel_base <= 1e-9) {
+        throw std::invalid_argument("wheel_base must be positive");
+    }
     path_.push_back({x_, y_, theta_});
 }
 
@@ -101,19 +104,20 @@ void print_simulation_summary(const MobileRobot& robot) {
     std::cout << "Final ";
     robot.print_pose();
 
+    const auto& path = robot.get_path();
     std::cout << "Total distance traveled: " <<
-    PathAnalyzer::compute_total_distance(robot.get_path()) <<
+    PathAnalyzer::compute_total_distance(path) <<
     " m" << std::endl;
 
     std::cout << "Net displacement: " <<
-    PathAnalyzer::compute_net_displacement(robot.get_path()) << 
+    PathAnalyzer::compute_net_displacement(path) << 
     " m" << std::endl;
 
     std::cout << "Final heading in degrees: " <<
-    PathAnalyzer::compute_final_heading_deg(robot.get_path()) << 
+    PathAnalyzer::compute_final_heading_deg(path) << 
     " deg" << std::endl;
 
     std::cout << "Maximum distance from origin: " <<
-    PathAnalyzer::compute_max_distance_from_origin(robot.get_path()) <<
+    PathAnalyzer::compute_max_distance_from_origin(path) <<
     " m" << std::endl;
 }

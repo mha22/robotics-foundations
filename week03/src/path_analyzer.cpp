@@ -44,3 +44,18 @@ double PathAnalyzer::compute_final_heading_deg(const std::vector<Pose>& path) {
     constexpr double rad_to_deg = 180.0 / 3.14159265358979323846;
     return path.back().theta * rad_to_deg;
 }
+
+double PathAnalyzer::compute_max_distance_from_origin(const std::vector<Pose>& path) {
+    if (path.empty()) {
+        return 0.0;
+    }
+    
+    double max_d = 0.0;
+    for (const Pose& p : path) {
+        double d = std::sqrt(p.x * p.x + p.y * p.y);
+        if (d > max_d) {
+            max_d = d;
+        }
+    }
+    return max_d;
+}

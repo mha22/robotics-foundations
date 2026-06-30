@@ -112,4 +112,8 @@ void print_simulation_summary(const MobileRobot& robot) {
     std::cout << "Final heading in degrees: " <<
     PathAnalyzer::compute_final_heading_deg(robot.get_path()) << 
     " deg" << std::endl;
+
+    std::cout << "Maximum distance from origin: " <<
+    PathAnalyzer::compute_max_distance_from_origin(robot.get_path()) <<
+    " m" << std::endl;
 }

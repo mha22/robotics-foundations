@@ -10,4 +10,6 @@ public:
     static double compute_net_displacement(const std::vector<Pose>& path);
 
     static double compute_final_heading_deg(const std::vector<Pose>& path);
+
+    static double compute_max_distance_from_origin(const std::vector<Pose>& path);
 };

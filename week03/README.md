@@ -144,6 +144,7 @@ When you run the program, it does the following:
    - Total distance traveled (accumulated arc length)
    - Net displacement (straight-line distance from start to end)
    - Final heading in degrees
+   - Maximum distance from origin
 3. Generates a trajectory CSV file.
 
 ### CSV files by mode
@@ -165,6 +166,7 @@ Final pose: x=2.30857, y=3.51752, theta=2 rad (114.592 deg)
 Total distance traveled: 5 m
 Net displacement: 4.20743 m
 Final heading in degrees: 114.592 deg
+Maximum distance from origin: 4.20743 m
 ```
 
 **Example CSV Content:**

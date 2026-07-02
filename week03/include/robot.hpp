@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+
+namespace robot_sim {
 struct WheelCommand {
     double omega_left;
     double omega_right;
@@ -42,7 +44,7 @@ public:
 
     void move_from_wheel_speeds(const WheelCommand& cmd,  double dt);
 
-    void print_pose() const;
+    std::string get_pose_string() const;
 
     Pose get_pose() const;
         
@@ -60,6 +62,7 @@ private:
 };
 
 
+
 void runSimulation(MobileRobot& robot, const SimulationConfig& config);
 
 void runWheelSimulation(MobileRobot& robot,
@@ -67,3 +70,5 @@ void runWheelSimulation(MobileRobot& robot,
                         const std::string& filename);
 
 void print_simulation_summary(const MobileRobot& robot);
+
+}

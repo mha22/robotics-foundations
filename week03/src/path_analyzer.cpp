@@ -3,6 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 
+namespace robot_sim {
 
 double PathAnalyzer::normalize_deg_signed(double deg) {
     double r = std::fmod(deg + 180.0, 360.0);
@@ -69,4 +70,6 @@ double PathAnalyzer::compute_max_distance_from_origin(const std::vector<Pose>& p
         }
     }
     return max_d;
+}
+
 }

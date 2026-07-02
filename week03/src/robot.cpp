@@ -1,9 +1,13 @@
+#include "logger.hpp"
 #include "robot.hpp"
 #include "path_analyzer.hpp"
 
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
+namespace robot_sim {
 
 MobileRobot::MobileRobot(double x, double y, double theta) 
     : x_(x),
@@ -41,14 +45,16 @@ void MobileRobot::move_from_wheel_speeds(const WheelCommand& cmd, double dt) {
     move(v, w, dt);
 }
 
-void MobileRobot::print_pose() const {
+std::string MobileRobot::get_pose_string() const {
     constexpr double rad_to_deg = 180.0 / 3.14159265358979323846;
-    std::cout << "pose: x=" << x_
+    std::ostringstream oss;
+    oss << "pose: x=" << x_
           << ", y=" << y_
           << ", theta=" << theta_
           << " rad"
-          << " (" << theta_ * rad_to_deg << " deg)"
-          << std::endl;
+          << " (" << theta_ * rad_to_deg << " deg)";
+        
+    return oss.str();
 }
 
 Pose MobileRobot::get_pose() const {
@@ -63,7 +69,8 @@ void MobileRobot::save_to_csv(const std::string& filename) const {
     std::ofstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << " for writing." << std::endl;
+
+        Logger::error("Could not open file " + filename + " for writing");
         return;
     }
 
@@ -101,23 +108,29 @@ void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config,
 
 
 void print_simulation_summary(const MobileRobot& robot) {
-    std::cout << "Final ";
-    robot.print_pose();
-
     const auto& path = robot.get_path();
-    std::cout << "Total distance traveled: " <<
-    PathAnalyzer::compute_total_distance(path) <<
-    " m" << std::endl;
 
-    std::cout << "Net displacement: " <<
+
+
+    std::ostringstream oss;
+    oss << "Final " << robot.get_pose_string() << "\n"
+    << "Total distance traveled: " <<
+    PathAnalyzer::compute_total_distance(path)
+    << " m\n"
+
+    << "Net displacement: " <<
     PathAnalyzer::compute_net_displacement(path) << 
-    " m" << std::endl;
+    " m\n"
 
-    std::cout << "Final heading in degrees: " <<
+    << "Final heading in degrees: " <<
     PathAnalyzer::compute_final_heading_deg(path) << 
-    " deg" << std::endl;
+    " deg\n"
 
-    std::cout << "Maximum distance from origin: " <<
+    << "Maximum distance from origin: " <<
     PathAnalyzer::compute_max_distance_from_origin(path) <<
-    " m" << std::endl;
+    " m";
+
+    Logger::info(oss.str());
+}
+
 }

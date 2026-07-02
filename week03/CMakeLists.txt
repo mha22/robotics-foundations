@@ -7,7 +7,7 @@ project(
     LANGUAGES CXX
 )
 
-add_library(robot_core src/robot.cpp src/path_analyzer.cpp)
+add_library(robot_core src/robot.cpp src/path_analyzer.cpp src/logger.cpp)
 
 target_include_directories(robot_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include

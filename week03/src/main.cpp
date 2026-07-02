@@ -1,21 +1,23 @@
 #include "robot.hpp"
+#include "logger.hpp"
 
 #include <iostream>
 #include <string>
 
+using namespace robot_sim;
 
 int main(int argc, char* argv[]) {
 
     if (argc == 1) {
-        std::cout << "===== Test 1: omega_left = omega_right (straight) ====="  << std::endl;
+        Logger::info("===== Test 1: omega_left = omega_right (straight) =====");
         MobileRobot robot1(0.0, 0.0, 0.0);
         runWheelSimulation(robot1, {{10.0, 10.0}, 0.1, 100}, "path_wheel_straight.csv");
 
-        std::cout << "\n==== Test 2: omega_left = -omega_right (rotate in place) ====="  << std::endl;
+        Logger::info("\n==== Test 2: omega_left = -omega_right (rotate in place) =====");
         MobileRobot robot2(0.0, 0.0, 0.0);
         runWheelSimulation(robot2, {{-5.0, 5.0}, 0.1, 100}, "path_wheel_rotate.csv");     
 
-        std::cout << "\n===== Test 3: omega_right > omega_left (arc) ====="  << std::endl;
+        Logger::info("\n===== Test 3: omega_right > omega_left (arc) =====");
         MobileRobot robot3 (0.0, 0.0, 0.0);
         runWheelSimulation(robot3, {{5.0, 10.0}, 0.1, 100}, "path_wheel_arc.csv");
     }
@@ -47,10 +49,11 @@ int main(int argc, char* argv[]) {
     }
 
     else {
-        std::cerr << "Usage:" << std::endl;
-        std::cerr << "  " << argv[0] << " (run default tests)" << std::endl;
-        std::cerr << "  " << argv[0] << " <v> <w> <dt> <steps> (unicycle mode)" << std::endl;
-        std::cerr << "  " << argv[0] << " <omega_l> <omega_r> <dt> <steps> <wheel_r> <wheel_base> (differential drive)" << std::endl;
+        Logger::error("Invalid arguments");
+        Logger::info("Usage:");
+        Logger::info("  " + std::string(argv[0]) + " (run default tests)");
+        Logger::info("  " + std::string(argv[0]) + " <v> <w> <dt> <steps> (unicycle mode)");
+        Logger::info("  " + std::string(argv[0]) + " <omega_l> <omega_r> <dt> <steps> <wheel_r> <wheel_base> (differential drive)");
         return 1;
     }
 

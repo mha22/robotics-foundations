@@ -3,6 +3,8 @@
 #include "robot.hpp"
 #include <vector>
 
+namespace robot_sim {
+
 class PathAnalyzer {
 public:
     static double normalize_deg_signed(double deg);
@@ -15,3 +17,5 @@ public:
 
     static double compute_max_distance_from_origin(const std::vector<Pose>& path);
 };
+
+}

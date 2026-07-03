@@ -1,6 +1,5 @@
 #include "logger.hpp"
 #include "robot.hpp"
-#include "path_analyzer.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -85,51 +84,6 @@ void MobileRobot::save_to_csv(const std::string& filename) const {
     }
 
     file.close();
-}
-
-
-void runSimulation(const std::shared_ptr<MobileRobot>& robot, const SimulationConfig& config) {
-    for (int i = 0; i < config.steps; i++) {
-        robot->move(config.v, config.w, config.dt);
-    }
-
-    print_simulation_summary(robot);
-    robot->save_to_csv("path.csv");
-}
-
-
-void runWheelSimulation(const std::shared_ptr<MobileRobot>& robot, const WheelSimulationConfig& config, const std::string& filename) {
-    for (int i = 0; i < config.steps; i++) {
-        robot->move_from_wheel_speeds(config.command, config.dt);
-    }
-
-    print_simulation_summary(robot);
-    robot->save_to_csv(filename);
-}
-
-
-void print_simulation_summary(const std::shared_ptr<MobileRobot>& robot) {
-    const auto& path = robot->get_path();
-
-    std::ostringstream oss;
-    oss << "Final " << robot->get_pose_string() << "\n"
-    << "Total distance traveled: " <<
-    PathAnalyzer::compute_total_distance(path)
-    << " m\n"
-
-    << "Net displacement: " <<
-    PathAnalyzer::compute_net_displacement(path) << 
-    " m\n"
-
-    << "Final heading in degrees: " <<
-    PathAnalyzer::compute_final_heading_deg(path) << 
-    " deg\n"
-
-    << "Maximum distance from origin: " <<
-    PathAnalyzer::compute_max_distance_from_origin(path) <<
-    " m";
-
-    Logger::info(oss.str());
 }
 
 }

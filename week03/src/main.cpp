@@ -1,60 +1,18 @@
-#include "robot.hpp"
+#include "simulation_app.hpp"
 #include "logger.hpp"
 
-#include <iostream>
-#include <string>
 #include <memory>
 
 using namespace robot_sim;
 
 int main(int argc, char* argv[]) {
-
-    if (argc == 1) {
-        Logger::info("===== Test 1: omega_left = omega_right (straight) =====");
-        auto robot1 = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
-        runWheelSimulation(robot1, {{10.0, 10.0}, 0.1, 100}, "path_wheel_straight.csv");
-
-        Logger::info("\n==== Test 2: omega_left = -omega_right (rotate in place) =====");
-        auto robot2 = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
-        runWheelSimulation(robot2, {{-5.0, 5.0}, 0.1, 100}, "path_wheel_rotate.csv");     
-
-        Logger::info("\n===== Test 3: omega_right > omega_left (arc) =====");
-        auto robot3 = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
-        runWheelSimulation(robot3, {{5.0, 10.0}, 0.1, 100}, "path_wheel_arc.csv");
+    try {
+        auto app = std::make_unique<SimulationApp>();
+        app->setup(argc, argv);
+        app->execute();
     }
-    else if (argc == 5) {
-        SimulationConfig config{
-        std::stod(argv[1]),
-        std::stod(argv[2]),
-        std::stod(argv[3]),
-        std::stoi(argv[4])
-        };
-        auto robot = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
-        runSimulation(robot, config);
-
-    }
-    else if (argc == 7) {
-        WheelSimulationConfig config{
-        {std::stod(argv[1]), std::stod(argv[2])},
-        std::stod(argv[3]),
-        std::stoi(argv[4])
-        };
-
-        RobotGeometry geometry{
-            std::stod(argv[5]),    
-            std::stod(argv[6])
-        };
-
-        auto robot = std::make_shared<MobileRobot>(0.0, 0.0, 0.0, geometry);
-        runWheelSimulation(robot, config, "path_wheel.csv");
-    }
-
-    else {
-        Logger::error("Invalid arguments");
-        Logger::info("Usage:");
-        Logger::info("  " + std::string(argv[0]) + " (run default tests)");
-        Logger::info("  " + std::string(argv[0]) + " <v> <w> <dt> <steps> (unicycle mode)");
-        Logger::info("  " + std::string(argv[0]) + " <omega_l> <omega_r> <dt> <steps> <wheel_r> <wheel_base> (differential drive)");
+    catch (const std::exception& e) {
+        Logger::error(e.what());
         return 1;
     }
 

@@ -41,15 +41,11 @@ public:
     MobileRobot(double x, double y, double theta, const RobotGeometry& geometry);
 
     void move(double v, double w, double dt);
-
     void move_from_wheel_speeds(const WheelCommand& cmd,  double dt);
 
     std::string get_pose_string() const;
-
     Pose get_pose() const;
-        
     const std::vector<Pose>& get_path() const;
-
     void save_to_csv(const std::string& filename) const;
 
 
@@ -60,15 +56,5 @@ private:
     RobotGeometry geometry_;
     std::vector<Pose> path_; 
 };
-
-
-
-void runSimulation(const std::shared_ptr<MobileRobot>& robot, const SimulationConfig& config);
-
-void runWheelSimulation(const std::shared_ptr<MobileRobot>& robot,
-                        const WheelSimulationConfig& config,
-                        const std::string& filename);
-
-void print_simulation_summary(const std::shared_ptr<MobileRobot>& robot);
 
 }

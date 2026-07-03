@@ -47,6 +47,7 @@ void MobileRobot::move_from_wheel_speeds(const WheelCommand& cmd, double dt) {
 
 std::string MobileRobot::get_pose_string() const {
     constexpr double rad_to_deg = 180.0 / 3.14159265358979323846;
+    
     std::ostringstream oss;
     oss << "pose: x=" << x_
           << ", y=" << y_
@@ -87,33 +88,31 @@ void MobileRobot::save_to_csv(const std::string& filename) const {
 }
 
 
-void runSimulation(MobileRobot& robot, const SimulationConfig& config) {
+void runSimulation(const std::shared_ptr<MobileRobot>& robot, const SimulationConfig& config) {
     for (int i = 0; i < config.steps; i++) {
-        robot.move(config.v, config.w, config.dt);
+        robot->move(config.v, config.w, config.dt);
     }
 
     print_simulation_summary(robot);
-    robot.save_to_csv("path.csv");
+    robot->save_to_csv("path.csv");
 }
 
 
-void runWheelSimulation(MobileRobot& robot, const WheelSimulationConfig& config, const std::string& filename) {
+void runWheelSimulation(const std::shared_ptr<MobileRobot>& robot, const WheelSimulationConfig& config, const std::string& filename) {
     for (int i = 0; i < config.steps; i++) {
-        robot.move_from_wheel_speeds(config.command, config.dt);
+        robot->move_from_wheel_speeds(config.command, config.dt);
     }
 
     print_simulation_summary(robot);
-    robot.save_to_csv(filename);
+    robot->save_to_csv(filename);
 }
 
 
-void print_simulation_summary(const MobileRobot& robot) {
-    const auto& path = robot.get_path();
-
-
+void print_simulation_summary(const std::shared_ptr<MobileRobot>& robot) {
+    const auto& path = robot->get_path();
 
     std::ostringstream oss;
-    oss << "Final " << robot.get_pose_string() << "\n"
+    oss << "Final " << robot->get_pose_string() << "\n"
     << "Total distance traveled: " <<
     PathAnalyzer::compute_total_distance(path)
     << " m\n"

@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-
+#include <memory>
 
 namespace robot_sim {
 struct WheelCommand {
@@ -63,12 +63,12 @@ private:
 
 
 
-void runSimulation(MobileRobot& robot, const SimulationConfig& config);
+void runSimulation(const std::shared_ptr<MobileRobot>& robot, const SimulationConfig& config);
 
-void runWheelSimulation(MobileRobot& robot,
+void runWheelSimulation(const std::shared_ptr<MobileRobot>& robot,
                         const WheelSimulationConfig& config,
                         const std::string& filename);
 
-void print_simulation_summary(const MobileRobot& robot);
+void print_simulation_summary(const std::shared_ptr<MobileRobot>& robot);
 
 }

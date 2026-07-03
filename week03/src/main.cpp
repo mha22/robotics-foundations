@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 using namespace robot_sim;
 
@@ -10,15 +11,15 @@ int main(int argc, char* argv[]) {
 
     if (argc == 1) {
         Logger::info("===== Test 1: omega_left = omega_right (straight) =====");
-        MobileRobot robot1(0.0, 0.0, 0.0);
+        auto robot1 = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
         runWheelSimulation(robot1, {{10.0, 10.0}, 0.1, 100}, "path_wheel_straight.csv");
 
         Logger::info("\n==== Test 2: omega_left = -omega_right (rotate in place) =====");
-        MobileRobot robot2(0.0, 0.0, 0.0);
+        auto robot2 = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
         runWheelSimulation(robot2, {{-5.0, 5.0}, 0.1, 100}, "path_wheel_rotate.csv");     
 
         Logger::info("\n===== Test 3: omega_right > omega_left (arc) =====");
-        MobileRobot robot3 (0.0, 0.0, 0.0);
+        auto robot3 = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
         runWheelSimulation(robot3, {{5.0, 10.0}, 0.1, 100}, "path_wheel_arc.csv");
     }
     else if (argc == 5) {
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]) {
         std::stod(argv[3]),
         std::stoi(argv[4])
         };
-        MobileRobot robot(0.0, 0.0, 0.0);
+        auto robot = std::make_shared<MobileRobot>(0.0, 0.0, 0.0);
         runSimulation(robot, config);
 
     }
@@ -44,7 +45,7 @@ int main(int argc, char* argv[]) {
             std::stod(argv[6])
         };
 
-        MobileRobot robot(0.0, 0.0, 0.0, geometry);
+        auto robot = std::make_shared<MobileRobot>(0.0, 0.0, 0.0, geometry);
         runWheelSimulation(robot, config, "path_wheel.csv");
     }
 

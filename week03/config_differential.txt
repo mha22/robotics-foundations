@@ -1,0 +1,8 @@
+mode=differential
+omega_left=5.0
+omega_right=10.0
+dt=0.1
+steps=100
+wheel_radius=0.05
+wheel_base=0.3
+csv=path_wheel_from_config.csv

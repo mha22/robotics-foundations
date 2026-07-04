@@ -1,0 +1,6 @@
+mode=unicycle
+v=1.0
+w=0.5
+dt=0.1
+steps=100
+csv=path_from_config.csv

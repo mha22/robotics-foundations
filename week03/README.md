@@ -28,10 +28,11 @@ The simulation tracks the robot's pose (`x`, `y`, `theta`), calculates path metr
 │   ├── robot.hpp
 │   └── simulation_app.hpp
 └── src/
-├── main.cpp
-├── path_analyzer.cpp
-├── robot.cpp
-└── simulation_app.cpp
+    ├── logger.cpp
+    ├── main.cpp
+    ├── path_analyzer.cpp
+    ├── robot.cpp
+    └── simulation_app.cpp
 ```
 
 **Key components:**

@@ -44,6 +44,8 @@ private:
         const std::string& default_value
     ) const;
 
+    std::string trim(const std::string& text) const;
+
 private:
     std::shared_ptr<MobileRobot> robot_;
     Mode mode_;

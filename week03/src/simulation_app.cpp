@@ -224,15 +224,17 @@ SimulationApp::parse_config_file(const std::string& filename) const {
     while (std::getline(file, line)) {
         line_number++;
 
-        if (line.empty()) {
+        std::string trimmed_line = trim(line);
+
+        if (trimmed_line.empty()) {
             continue;
         }
 
-        if (line[0] == '#') {
+        if (trimmed_line[0] == '#') {
             continue;
         }
 
-        std::size_t equal_pos = line.find('=');
+        std::size_t equal_pos = trimmed_line.find('=');
 
         if (equal_pos == std::string::npos) {
             throw std::runtime_error(
@@ -241,8 +243,15 @@ SimulationApp::parse_config_file(const std::string& filename) const {
             );
         }
 
-        std::string key = line.substr(0, equal_pos);
-        std::string value = line.substr(equal_pos + 1);
+        std::string key = trim(trimmed_line.substr(0, equal_pos));
+        std::string value = trim(trimmed_line.substr(equal_pos + 1));
+
+        if (key.empty()) {
+            throw std::runtime_error(
+                "Invalid config line " + std::to_string(line_number) +
+                ": empty key"
+            );
+        }
 
         config[key] = value;
     }
@@ -275,6 +284,18 @@ std::string SimulationApp::get_optional(
     }
 
     return it->second;
+}
+
+std::string SimulationApp::trim(const std::string& text) const {
+    const std::string whitespace = " \t\r\n";
+
+    const auto start = text.find_first_not_of(whitespace);
+    if (start == std::string::npos) {
+        return "";
+    }
+
+    const auto end = text.find_last_not_of(whitespace);
+    return text.substr(start, end - start + 1);
 }
 
 }

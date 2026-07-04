@@ -5,27 +5,36 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 namespace robot_sim {
 
-MobileRobot::MobileRobot(double x, double y, double theta) 
-    : x_(x),
-    y_(y),
-    theta_(theta),
-    geometry_{0.05, 0.3}
-{
-    path_.push_back({x_, y_, theta_});
+namespace {
+constexpr double kDefaultWheelRadius = 0.05;
+constexpr double kDefaultWheelBase = 0.3;
+constexpr double kEpsilon = 1e-9;
 }
 
-MobileRobot::MobileRobot(double x, double y, double theta, const RobotGeometry& geometry) 
+MobileRobot::MobileRobot(double x, double y, double theta) 
+    : MobileRobot(x, y, theta, RobotGeometry{kDefaultWheelRadius, kDefaultWheelBase})
+{
+    
+}
+
+MobileRobot::MobileRobot(double x, double y, double theta, const RobotGeometry& geometry)
     : x_(x),
-    y_(y),
-    theta_(theta),
-    geometry_(geometry)
+      y_(y),
+      theta_(theta),
+      geometry_(geometry)
 {    
-    if (geometry_.wheel_base <= 1e-9) {
+    if (geometry_.wheel_radius <= kEpsilon) {
+        throw std::invalid_argument("wheel_radius must be positive");
+    }
+    
+    if (geometry_.wheel_base <= kEpsilon) {
         throw std::invalid_argument("wheel_base must be positive");
     }
+
     path_.push_back({x_, y_, theta_});
 }
 

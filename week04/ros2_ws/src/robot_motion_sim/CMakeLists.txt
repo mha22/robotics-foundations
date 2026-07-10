@@ -8,6 +8,23 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+
+add_executable(simple_timer_node src/simple_timer_node.cpp)
+ament_target_dependencies(simple_timer_node rclcpp)
+
+add_executable(pose_publisher_node src/pose_publisher_node.cpp)
+ament_target_dependencies(
+  pose_publisher_node
+  rclcpp
+  geometry_msgs
+)
+
+install(TARGETS
+  simple_timer_node
+  pose_publisher_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -23,10 +40,4 @@ endif()
 
 ament_package()
 
-add_executable(simple_timer_node src/simple_timer_node.cpp)
-ament_target_dependencies(simple_timer_node rclcpp)
 
-install(TARGETS
-  simple_timer_node
-  DESTINATION lib/${PROJECT_NAME}
-)

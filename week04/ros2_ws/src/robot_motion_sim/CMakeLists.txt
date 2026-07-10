@@ -20,9 +20,17 @@ ament_target_dependencies(
   geometry_msgs
 )
 
+add_executable(velocity_subscriber_node src/velocity_subscriber_node.cpp)
+ament_target_dependencies(
+  velocity_subscriber_node
+  rclcpp
+  geometry_msgs
+)
+
 install(TARGETS
   simple_timer_node
   pose_publisher_node
+  velocity_subscriber_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

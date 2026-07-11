@@ -10,8 +10,16 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
-add_executable(simple_timer_node src/simple_timer_node.cpp)
-ament_target_dependencies(simple_timer_node rclcpp)
+add_library(robot_core
+  src/robot.cpp
+)
+
+target_compile_features(robot_core PUBLIC cxx_std_17)
+
+target_include_directories(robot_core PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 
 add_executable(pose_publisher_node src/pose_publisher_node.cpp)
 ament_target_dependencies(
@@ -27,11 +35,32 @@ ament_target_dependencies(
   geometry_msgs
 )
 
-install(TARGETS
-  simple_timer_node
-  pose_publisher_node
-  velocity_subscriber_node
-  DESTINATION lib/${PROJECT_NAME}
+add_executable(robot_simulator_node src/robot_simulator_node.cpp)
+ament_target_dependencies(
+  robot_simulator_node
+  rclcpp
+  geometry_msgs
+)
+
+target_link_libraries(
+  robot_simulator_node
+  robot_core
+)
+
+install(
+  TARGETS
+    robot_core
+    pose_publisher_node
+    velocity_subscriber_node
+    robot_simulator_node
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
 if(BUILD_TESTING)
@@ -47,5 +76,3 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
-
-

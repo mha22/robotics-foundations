@@ -1,5 +1,6 @@
 *.png
 !week04/ros2_ws/src/robot_motion_sim/docs/rqt_graph.png
+!week05/ros2_ws/src/robot_motion_sim/docs/rqt_graph.png
 
 build/
 install/

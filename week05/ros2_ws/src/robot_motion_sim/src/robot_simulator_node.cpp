@@ -4,9 +4,13 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tf2/LinearMath/Quaternion.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 
 #include <chrono>
 #include <functional>
+#include <string>
+#include <memory>
 
 class RobotSimulatorNode : public rclcpp::Node {
 public:
@@ -19,6 +23,10 @@ public:
         last_command_time_(now()),
         command_timeout_(rclcpp::Duration::from_seconds(0.5))
         {
+
+        odom_frame_id_ = declare_parameter<std::string>("odom_frame_id", "odom");
+        base_frame_id_ = declare_parameter<std::string>("base_frame_id", "base_link");
+
         cmd_subscription_ = create_subscription<geometry_msgs::msg::Twist>(
             "cmd_vel",
             10,
@@ -27,7 +35,7 @@ public:
 
         odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("odom", 10);
 
-
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
         
         const double timeout_seconds = declare_parameter<double>("command_timeout", 0.5);
         command_timeout_ = rclcpp::Duration::from_seconds(timeout_seconds);
@@ -61,25 +69,15 @@ private:
         last_command_time_ = now();
     }
 
-    void update()
-    {
-        if ((now() - last_command_time_) > command_timeout_) {
-            linear_velocity_ = 0.0;
-            angular_velocity_ = 0.0;
-        }
-        
-        const double dt =  1.0 / update_rate_hz_;
-        robot_.move(linear_velocity_, angular_velocity_, dt);
-
-        
+    void publish_odometry(const rclcpp::Time& stamp) {
         const robot_sim::Pose pose = robot_.get_pose();
         tf2::Quaternion q;
         q.setRPY(0.0, 0.0, pose.theta);
 
         nav_msgs::msg::Odometry odom;
-        odom.header.stamp = now();
-        odom.header.frame_id = "odom";
-        odom.child_frame_id = "base_link";
+        odom.header.stamp = stamp;
+        odom.header.frame_id = odom_frame_id_;
+        odom.child_frame_id = base_frame_id_;
 
         odom.pose.pose.position.x = pose.x;
         odom.pose.pose.position.y = pose.y;
@@ -95,6 +93,50 @@ private:
     
         odom_publisher_->publish(odom);
     }
+    
+    void broadcast_transform(const rclcpp::Time& stamp) {
+        const robot_sim::Pose pose = robot_.get_pose();
+        tf2::Quaternion q;
+        q.setRPY(0.0, 0.0, pose.theta);
+
+        geometry_msgs::msg::TransformStamped transform;
+        transform.header.stamp = stamp;
+        transform.header.frame_id = odom_frame_id_;
+        transform.child_frame_id = base_frame_id_;
+
+        transform.transform.translation.x = pose.x;
+        transform.transform.translation.y = pose.y;
+        transform.transform.translation.z = 0.0;
+        
+
+        transform.transform.rotation.x = q.x();
+        transform.transform.rotation.y = q.y();
+        transform.transform.rotation.z = q.z();
+        transform.transform.rotation.w = q.w();
+
+        tf_broadcaster_->sendTransform(transform);
+    }
+
+    void apply_command_timeout() {
+        if ((now() - last_command_time_) > command_timeout_) {
+            linear_velocity_ = 0.0;
+            angular_velocity_ = 0.0;
+        }
+    }
+
+    void update()
+    {
+        apply_command_timeout();
+
+        const double dt =  1.0 / update_rate_hz_;
+        robot_.move(linear_velocity_, angular_velocity_, dt);
+        
+        const auto current_time = now();
+
+        publish_odometry(current_time);
+        broadcast_transform(current_time);
+
+    }
 
 private:
     robot_sim::MobileRobot robot_;
@@ -102,12 +144,16 @@ private:
     double angular_velocity_;
     double update_rate_hz_;
 
+    std::string odom_frame_id_;
+    std::string base_frame_id_;
+
     rclcpp::Time last_command_time_;
     rclcpp::Duration command_timeout_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_subscription_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 };
 
 

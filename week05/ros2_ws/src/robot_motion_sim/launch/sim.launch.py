@@ -3,6 +3,10 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration
+
 from launch_ros.actions import Node
 
 
@@ -21,6 +25,14 @@ def generate_launch_description():
         'sim.rviz'
     )
 
+    use_rviz = LaunchConfiguration('use_rviz')
+
+    declare_use_rviz_arg = DeclareLaunchArgument(
+        'use_rviz',
+        default_value='true',
+        description='Whether to launch RViz'
+    )
+
     robot_simulator_node = Node(
         package='robot_motion_sim',
         executable='robot_simulator_node',
@@ -34,10 +46,12 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='screen',
-        arguments=['-d', rviz_config_file]
+        arguments=['-d', rviz_config_file],
+        condition=IfCondition(use_rviz)
     )
 
     return LaunchDescription([
+        declare_use_rviz_arg,
         robot_simulator_node,
         rviz_node
     ])

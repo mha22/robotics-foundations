@@ -15,6 +15,12 @@ def generate_launch_description():
         'sim_params.yaml'
     )
 
+    rviz_config_file = os.path.join(
+        package_share_dir,
+        'rviz',
+        'sim.rviz'
+    )
+
     robot_simulator_node = Node(
         package='robot_motion_sim',
         executable='robot_simulator_node',
@@ -23,6 +29,15 @@ def generate_launch_description():
         parameters=[params_file]
     )
 
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config_file]
+    )
+
     return LaunchDescription([
-        robot_simulator_node
+        robot_simulator_node,
+        rviz_node
     ])

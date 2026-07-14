@@ -60,6 +60,11 @@ install(
 )
 
 install(
+  DIRECTORY launch config rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(
   DIRECTORY include/
   DESTINATION include
 )

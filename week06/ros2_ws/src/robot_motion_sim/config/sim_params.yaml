@@ -1,0 +1,6 @@
+robot_simulator_node:
+  ros__parameters:
+    update_rate_hz: 1.0
+    command_timeout: 0.5
+    odom_frame_id: "odom"
+    base_frame_id: "base_link"

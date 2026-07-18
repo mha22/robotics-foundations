@@ -25,10 +25,10 @@ def generate_launch_description():
         'sim.rviz'
     )
 
-    urdf_file = os.path.join(
+    xacro_file = os.path.join(
         package_share_dir,
         'urdf',
-        'robot.urdf'
+        'robot.urdf.xacro'
     )
 
     use_rviz = LaunchConfiguration('use_rviz')
@@ -53,7 +53,7 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[{
-            'robot_description': Command(['cat ', urdf_file])
+            'robot_description': Command(['xacro  ', xacro_file])
         }]
     )
 

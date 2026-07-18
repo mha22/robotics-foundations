@@ -6,6 +6,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2_ros/transform_broadcaster.h>
+#include <sensor_msgs/msg/joint_state.hpp>
 
 #include <chrono>
 #include <functional>
@@ -36,7 +37,13 @@ public:
         odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("odom", 10);
 
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+
+        joint_state_publisher_ = create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
         
+        left_wheel_joint_name_ = declare_parameter<std::string>("left_wheel_joint_name", "left_wheel_joint");
+
+        right_wheel_joint_name_ = declare_parameter<std::string>("right_wheel_joint_name", "right_wheel_joint");
+
         const double timeout_seconds = declare_parameter<double>("command_timeout", 0.5);
         command_timeout_ = rclcpp::Duration::from_seconds(timeout_seconds);
 
@@ -117,6 +124,27 @@ private:
         tf_broadcaster_->sendTransform(transform);
     }
 
+    void publish_joint_states(const rclcpp::Time& stamp) {
+        sensor_msgs::msg::JointState joint_state;
+        joint_state.header.stamp = stamp;
+        
+        joint_state.name = {
+            left_wheel_joint_name_,
+            right_wheel_joint_name_
+        };
+
+        left_wheel_position_rad_ += 0.05;
+        right_wheel_position_rad_ += 0.05;
+
+        joint_state.position = {
+            left_wheel_position_rad_,
+            right_wheel_position_rad_
+        };
+
+        joint_state_publisher_->publish(joint_state);
+
+    }
+
     void apply_command_timeout() {
         if ((now() - last_command_time_) > command_timeout_) {
             linear_velocity_ = 0.0;
@@ -135,6 +163,7 @@ private:
 
         publish_odometry(current_time);
         broadcast_transform(current_time);
+        publish_joint_states(current_time);
 
     }
 
@@ -143,9 +172,14 @@ private:
     double linear_velocity_;
     double angular_velocity_;
     double update_rate_hz_;
+    double left_wheel_position_rad_{0.0};
+    double right_wheel_position_rad_{0.0};
+
 
     std::string odom_frame_id_;
     std::string base_frame_id_;
+    std::string left_wheel_joint_name_;
+    std::string right_wheel_joint_name_;
 
     rclcpp::Time last_command_time_;
     rclcpp::Duration command_timeout_;
@@ -154,6 +188,7 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_subscription_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;
 };
 
 

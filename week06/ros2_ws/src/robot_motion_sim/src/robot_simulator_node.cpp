@@ -44,6 +44,26 @@ public:
 
         right_wheel_joint_name_ = declare_parameter<std::string>("right_wheel_joint_name", "right_wheel_joint");
 
+        wheel_radius_ = declare_parameter<double>("wheel_radius", 0.05);
+        if (wheel_radius_ <= 0.0) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid wheel_radius %.3f. Resetting to default 0.05",
+                wheel_radius_
+            );
+            wheel_radius_ = 0.05;
+        }
+
+        wheel_base_ = declare_parameter<double>("wheel_base", 0.28);
+        if (wheel_base_ <= 0.0) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid wheel_base %.3f. Resetting to default 0.28",
+                wheel_base_
+            );
+            wheel_base_ = 0.28;
+        }
+
         const double timeout_seconds = declare_parameter<double>("command_timeout", 0.5);
         command_timeout_ = rclcpp::Duration::from_seconds(timeout_seconds);
 
@@ -133,12 +153,14 @@ private:
             right_wheel_joint_name_
         };
 
-        left_wheel_position_rad_ += 0.05;
-        right_wheel_position_rad_ += 0.05;
-
         joint_state.position = {
             left_wheel_position_rad_,
             right_wheel_position_rad_
+        };
+
+        joint_state.velocity = {
+            left_wheel_velocity_rad_s_,
+            right_wheel_velocity_rad_s_
         };
 
         joint_state_publisher_->publish(joint_state);
@@ -152,12 +174,30 @@ private:
         }
     }
 
+    void update_wheel_states(double dt) {
+        const double left_wheel_linear_velocity =
+            linear_velocity_ - angular_velocity_ * wheel_base_ / 2.0;
+        
+        const double right_wheel_linear_velocity = 
+            linear_velocity_ + angular_velocity_ * wheel_base_ / 2.0;
+        
+        left_wheel_velocity_rad_s_ = left_wheel_linear_velocity / wheel_radius_;
+
+        right_wheel_velocity_rad_s_ = right_wheel_linear_velocity / wheel_radius_;
+        
+        left_wheel_position_rad_ += left_wheel_velocity_rad_s_ * dt;
+        right_wheel_position_rad_ += right_wheel_velocity_rad_s_ * dt;
+    }
+
     void update()
-    {
+    {   
+        const double dt =  1.0 / update_rate_hz_;
+
         apply_command_timeout();
 
-        const double dt =  1.0 / update_rate_hz_;
         robot_.move(linear_velocity_, angular_velocity_, dt);
+
+        update_wheel_states(dt);
         
         const auto current_time = now();
 
@@ -174,6 +214,10 @@ private:
     double update_rate_hz_;
     double left_wheel_position_rad_{0.0};
     double right_wheel_position_rad_{0.0};
+    double wheel_radius_;
+    double wheel_base_;
+    double left_wheel_velocity_rad_s_{0.0};
+    double right_wheel_velocity_rad_s_{0.0};
 
 
     std::string odom_frame_id_;

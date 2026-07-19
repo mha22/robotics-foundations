@@ -13,7 +13,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     package_share_dir = get_package_share_directory('robot_motion_sim')
 
-    params_file = os.path.join(
+    default_params_file = os.path.join(
         package_share_dir,
         'config',
         'sim_params.yaml'
@@ -33,10 +33,19 @@ def generate_launch_description():
 
     use_rviz = LaunchConfiguration('use_rviz')
 
+    params_file = LaunchConfiguration('params_file')
+
+
     declare_use_rviz_arg = DeclareLaunchArgument(
         'use_rviz',
         default_value='true',
         description='Whether to launch RViz'
+    )
+
+    declare_params_file_arg = DeclareLaunchArgument(
+        'params_file',
+        default_value=default_params_file,
+        description='Path to the simulator parameters file'
     )
 
     robot_simulator_node = Node(
@@ -53,7 +62,7 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[{
-            'robot_description': Command(['xacro  ', xacro_file])
+            'robot_description': Command(['xacro ', xacro_file])
         }]
     )
 
@@ -69,6 +78,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         declare_use_rviz_arg,
+        declare_params_file_arg,
         robot_simulator_node,
         robot_state_publisher_node,
         rviz_node

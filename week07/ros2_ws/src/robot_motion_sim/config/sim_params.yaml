@@ -1,0 +1,25 @@
+robot_simulator_node:
+  ros__parameters:
+    update_rate_hz: 20.0
+    command_timeout: 0.5
+
+    odom_frame_id: "odom"
+    base_frame_id: "base_link"
+
+    wheel_radius: 0.05
+    wheel_base: 0.28
+
+    left_wheel_joint_name: "left_wheel_joint"
+    right_wheel_joint_name: "right_wheel_joint"
+
+    scan_rate_hz: 10.0
+    scan_angle_min: -1.5708
+    scan_angle_max: 1.5708
+    scan_angle_increment: 0.0174533
+    scan_range_min: 0.05
+    scan_range_max: 5.0
+    scan_frame_id: "laser_link"
+
+    laser_x_offset: 0.18
+    laser_y_offset: 0.0
+    laser_yaw_offset: 0.0

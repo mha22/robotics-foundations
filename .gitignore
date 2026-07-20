@@ -6,6 +6,8 @@
 !week06/ros2_ws/src/robot_motion_sim/docs/rviz_robot_model.png
 !week07/ros2_ws/src/robot_motion_sim/docs/rviz_tf_odom.png
 !week07/ros2_ws/src/robot_motion_sim/docs/rviz_robot_model.png
+!week07/ros2_ws/src/robot_motion_sim/docs/laser_scan.png
+
 
 build/
 install/

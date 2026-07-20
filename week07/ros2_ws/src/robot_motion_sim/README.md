@@ -528,6 +528,8 @@ Screenshots:
 
 ![Robot model in RViz](docs/rviz_robot_model.png)
 
+![Robot laser scan in RViz](docs/laser_scan.png)
+
 ## Frames
 
 Main frames:

@@ -14,6 +14,19 @@
 #include <string>
 #include <memory>
 #include <cmath>
+#include <vector>
+
+struct Point2D
+{
+    double x;
+    double y;
+};
+
+struct Segment2D
+{
+    Point2D p1;
+    Point2D p2;
+};
 
 class RobotSimulatorNode : public rclcpp::Node {
 public:
@@ -102,6 +115,8 @@ public:
             timer_period,
             std::bind(&RobotSimulatorNode::update, this)
         );
+
+        initialize_world();
     }
 
 private:
@@ -208,7 +223,24 @@ private:
             ) + 1;
 
 
-        scan.ranges.assign(beam_count, scan_range_max_);
+        scan.ranges.resize(beam_count);
+        scan.intensities.resize(beam_count);
+
+        const double laser_world_yaw = compute_laser_world_yaw();
+        const Point2D laser_position = compute_laser_world_position();
+
+        for (int i = 0; i < beam_count; ++i) {
+            const double angle_in_laser_frame = 
+                scan_angle_min_ + i * scan_angle_increment_;
+
+            const double angle_in_world = 
+                laser_world_yaw + angle_in_laser_frame;
+
+            const double range = cast_ray(angle_in_world, laser_position);
+
+            scan.ranges[i] = range;
+            scan.intensities[i] = 1.0;
+        }
 
         scan_publisher_->publish(scan);
     }
@@ -253,6 +285,105 @@ private:
         publish_laser_scan(current_time);
     }
 
+    void initialize_world() {
+        world_segments_.clear();
+
+        world_segments_.push_back({{-3.0, -2.0}, { 3.0, -2.0}});
+        world_segments_.push_back({{ 3.0, -2.0}, { 3.0,  2.0}});
+        world_segments_.push_back({{ 3.0,  2.0}, {-3.0,  2.0}});
+        world_segments_.push_back({{-3.0,  2.0}, {-3.0, -2.0}});
+
+        world_segments_.push_back({{0.8, -0.8}, {0.8, 0.8}});
+        world_segments_.push_back({{-1.2, 0.5}, {-0.3, 0.5}});
+    }
+
+    Point2D compute_laser_world_position() const {
+        const robot_sim::Pose pose = robot_.get_pose();
+
+        const double robot_x = pose.x;
+        const double robot_y = pose.y;
+        const double robot_theta = pose.theta;
+
+        Point2D laser;
+
+        laser.x = 
+            robot_x + 
+            std::cos(robot_theta) * laser_x_offset_ -
+            std::sin(robot_theta) * laser_y_offset_;
+
+        laser.y = 
+            robot_y +
+            std::sin(robot_theta) * laser_x_offset_ +
+            std::cos(robot_theta) * laser_y_offset_;
+        
+        return laser;
+    }
+
+    double compute_laser_world_yaw() const {
+        const robot_sim::Pose pose = robot_.get_pose();
+        
+        return pose.theta + laser_yaw_offset_;
+    }
+
+    bool intersect_ray_segment(
+        const Point2D& ray_origin,
+        double ray_angle,
+        const Segment2D& segment,
+        double& distance)
+    {
+        const double dx = std::cos(ray_angle);
+        const double dy = std::sin(ray_angle);
+
+        const double x1 = ray_origin.x;
+        const double y1 = ray_origin.y;
+
+        const double x2 = segment.p1.x;
+        const double y2 = segment.p1.y;
+        const double x3 = segment.p2.x;
+        const double y3 = segment.p2.y;
+
+        const double sx = x3 - x2;
+        const double sy = y3 - y2;
+
+        const double denominator = dx * sy - dy * sx;
+
+        if (std::fabs(denominator) < 1e-9) {
+            return false;
+        }
+
+        const double qpx = x2 - x1;
+        const double qpy = y2 - y1;
+
+        const double t = (qpx * sy - qpy * sx) / denominator;
+        const double u = (qpx * dy - qpy * dx) / denominator;
+
+        if (t >= 0.0 && u >= 0.0 && u <= 1.0) {
+            distance = t;
+            return true;
+        }
+
+        return false;
+    }
+
+    double cast_ray(double ray_angle, const Point2D& laser_position)
+    {
+        
+
+        double closest_distance = scan_range_max_;
+
+        for (const auto& segment : world_segments_) {
+            double distance = 0.0;
+
+            if (intersect_ray_segment(laser_position, ray_angle, segment, distance)) {
+                if (distance >= scan_range_min_ && distance < closest_distance) {
+                    closest_distance = distance;
+                }
+            }
+        }
+
+        return closest_distance;
+    }
+
 private:
     robot_sim::MobileRobot robot_;
     double linear_velocity_;
@@ -284,6 +415,8 @@ private:
 
     rclcpp::Time last_command_time_;
     rclcpp::Duration command_timeout_;
+
+    std::vector<Segment2D> world_segments_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_subscription_;

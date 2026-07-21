@@ -15,6 +15,7 @@
 #include <memory>
 #include <cmath>
 #include <vector>
+#include <random>
 
 struct Point2D
 {
@@ -96,6 +97,8 @@ public:
         laser_y_offset_ = declare_parameter<double>("laser_y_offset", 0.0);
         laser_yaw_offset_ = declare_parameter<double>("laser_yaw_offset", 0.0);
 
+        validate_lidar_parameters();
+
         const double timeout_seconds = declare_parameter<double>("command_timeout", 0.5);
         command_timeout_ = rclcpp::Duration::from_seconds(timeout_seconds);
 
@@ -117,6 +120,11 @@ public:
         );
 
         initialize_world();
+
+        scan_noise_enabled_ = declare_parameter<bool>("scan_noise_enabled", false);
+        scan_noise_stddev_ = declare_parameter<double>("scan_noise_stddev", 0.01);
+
+        scan_noise_distribution_ = std::normal_distribution<double>(0.0, scan_noise_stddev_);
     }
 
 private:
@@ -236,8 +244,8 @@ private:
             const double angle_in_world = 
                 laser_world_yaw + angle_in_laser_frame;
 
-            const double range = cast_ray(angle_in_world, laser_position);
-
+            double range = cast_ray(angle_in_world, laser_position);
+            range = apply_scan_noise(range);
             scan.ranges[i] = range;
             scan.intensities[i] = 1.0;
         }
@@ -282,7 +290,10 @@ private:
         publish_odometry(current_time);
         broadcast_transform(current_time);
         publish_joint_states(current_time);
-        publish_laser_scan(current_time);
+
+        if (should_publish_scan(current_time)) {
+            publish_laser_scan(current_time);
+        }
     }
 
     void initialize_world() {
@@ -384,6 +395,93 @@ private:
         return closest_distance;
     }
 
+    bool should_publish_scan(const rclcpp::Time& stamp) {
+        if (!has_last_scan_time_) {
+            last_scan_time_ = stamp;
+            has_last_scan_time_ = true;
+            return true;
+        }
+
+        const double elapsed = (stamp - last_scan_time_).seconds();
+
+        if (elapsed >= 1.0 / scan_rate_hz_) {
+            last_scan_time_ = stamp;
+            return true;
+        }
+
+        return false;
+    }
+
+    void validate_lidar_parameters()
+    {
+        if (scan_rate_hz_ <= 0.0) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid scan_rate_hz %.3f. Resetting to 10.0",
+                scan_rate_hz_
+            );
+            scan_rate_hz_ = 10.0;
+        }
+
+        if (scan_range_min_ < 0.0) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid scan_range_min %.3f. Resetting to 0.05",
+                scan_range_min_
+            );
+            scan_range_min_ = 0.05;
+        }
+
+        if (scan_range_max_ <= scan_range_min_) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid scan_range_max %.3f. Resetting to 5.0",
+                scan_range_max_
+            );
+            scan_range_max_ = 5.0;
+        }
+
+        if (scan_angle_increment_ <= 0.0) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid scan_angle_increment %.6f. Resetting to 1 degree",
+                scan_angle_increment_
+            );
+            scan_angle_increment_ = 0.0174533;
+        }
+
+        if (scan_angle_max_ <= scan_angle_min_) {
+            RCLCPP_WARN(
+                get_logger(),
+                "Invalid scan angle limits. Resetting to [-pi/2, pi/2]"
+            );
+            scan_angle_min_ = -1.5708;
+            scan_angle_max_ = 1.5708;
+        }
+    }
+
+    double apply_scan_noise(double range) {
+        if (!scan_noise_enabled_) {
+            return range;
+        }
+
+        if (range >= scan_range_max_) {
+            return range;
+        }
+
+        const double noisy_range = range + scan_noise_distribution_(random_engine_);
+
+        if (noisy_range < scan_range_min_) {
+            return scan_range_min_;
+        }
+
+        if (noisy_range > scan_range_max_) {
+            return scan_range_max_;
+        }
+
+        return noisy_range;
+    }
+
 private:
     robot_sim::MobileRobot robot_;
     double linear_velocity_;
@@ -403,6 +501,8 @@ private:
     double scan_range_min_;
     double scan_range_max_;
     std::string scan_frame_id_;
+    rclcpp::Time last_scan_time_;
+    bool has_last_scan_time_{false};
 
     double laser_x_offset_;
     double laser_y_offset_;
@@ -417,6 +517,11 @@ private:
     rclcpp::Duration command_timeout_;
 
     std::vector<Segment2D> world_segments_;
+
+    bool scan_noise_enabled_;
+    double scan_noise_stddev_;
+    std::default_random_engine random_engine_;
+    std::normal_distribution<double> scan_noise_distribution_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_subscription_;

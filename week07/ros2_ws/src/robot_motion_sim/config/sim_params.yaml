@@ -23,3 +23,6 @@ robot_simulator_node:
     laser_x_offset: 0.18
     laser_y_offset: 0.0
     laser_yaw_offset: 0.0
+
+    scan_noise_enabled: false
+    scan_noise_stddev: 0.01

@@ -100,7 +100,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 100
       Name: Odometry
       Position Tolerance: 0.10000000149011612
@@ -121,7 +121,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /odom
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -207,6 +207,18 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        walls: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /world_map
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -268,10 +280,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4953971207141876
+      Pitch: 0.5103971362113953
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.48402708768844604
+      Yaw: 0.7040269374847412
     Saved: ~
 Window Geometry:
   Displays:
@@ -289,5 +301,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 223
-  Y: 37
+  X: 569
+  Y: 38

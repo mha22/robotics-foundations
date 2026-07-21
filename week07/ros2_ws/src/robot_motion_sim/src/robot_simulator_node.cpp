@@ -8,6 +8,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include <chrono>
 #include <functional>
@@ -114,17 +115,19 @@ public:
         const auto timer_period = 
             std::chrono::duration<double>(1.0 / update_rate_hz_);
 
-        timer_ = create_wall_timer(
-            timer_period,
-            std::bind(&RobotSimulatorNode::update, this)
-        );
-
+        marker_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("world_map", 1);
+        
+        world_name_ = declare_parameter<std::string>("world_name", "simple_room");
         initialize_world();
 
         scan_noise_enabled_ = declare_parameter<bool>("scan_noise_enabled", false);
         scan_noise_stddev_ = declare_parameter<double>("scan_noise_stddev", 0.01);
-
         scan_noise_distribution_ = std::normal_distribution<double>(0.0, scan_noise_stddev_);
+        
+        timer_ = create_wall_timer(
+            timer_period,
+            std::bind(&RobotSimulatorNode::update, this)
+        );
     }
 
 private:
@@ -294,11 +297,71 @@ private:
         if (should_publish_scan(current_time)) {
             publish_laser_scan(current_time);
         }
+
+        static int counter = 0;
+        if (counter++ % 20 == 0) {
+            publish_world_markers(current_time);
+        }
     }
 
     void initialize_world() {
         world_segments_.clear();
 
+        if (world_name_ == "simple_room") {
+            initialize_simple_room();
+        }
+        else if (world_name_ == "corridor") {
+            initialize_corridor();
+        }
+        else {
+            RCLCPP_WARN(
+                get_logger(),
+                "Unknown world_name '%s'. Falling back to simple_room.",
+                world_name_.c_str()
+            );
+            initialize_simple_room();
+        }
+
+        create_world_markers();
+    }
+
+    void create_world_markers() {
+        world_markers_.markers.clear();
+        for (size_t i = 0; i < world_segments_.size(); ++i) {
+            visualization_msgs::msg::Marker marker;
+            marker.header.frame_id = odom_frame_id_;
+            marker.header.stamp = now();
+            marker.ns = "walls";
+            marker.id = i;
+            marker.type = visualization_msgs::msg::Marker::LINE_LIST;
+            marker.action = visualization_msgs::msg::Marker::ADD;
+            marker.pose.orientation.w = 1.0;
+
+            marker.color.r = 0.0; marker.color.g = 1.0; marker.color.b = 0.0; marker.color.a = 1.0;
+            marker.scale.x = 0.05;
+
+            geometry_msgs::msg::Point p1, p2;
+            p1.x = world_segments_[i].p1.x; p1.y = world_segments_[i].p1.y;
+            p2.x = world_segments_[i].p2.x; p2.y = world_segments_[i].p2.y;
+
+            marker.points.push_back(p1);
+            marker.points.push_back(p2);
+
+            world_markers_.markers.push_back(marker);
+        }
+    }
+
+    void publish_world_markers(const rclcpp::Time& stamp) {
+        for (auto& marker : world_markers_.markers) {
+            marker.header.stamp = stamp;
+        }
+
+        marker_publisher_->publish(world_markers_);
+    }
+
+    void initialize_simple_room() {
+        world_segments_.clear();
+        
         world_segments_.push_back({{-3.0, -2.0}, { 3.0, -2.0}});
         world_segments_.push_back({{ 3.0, -2.0}, { 3.0,  2.0}});
         world_segments_.push_back({{ 3.0,  2.0}, {-3.0,  2.0}});
@@ -307,6 +370,19 @@ private:
         world_segments_.push_back({{0.8, -0.8}, {0.8, 0.8}});
         world_segments_.push_back({{-1.2, 0.5}, {-0.3, 0.5}});
     }
+
+    void initialize_corridor() {
+        world_segments_.clear();
+
+        world_segments_.push_back({{-4.0, -0.8}, {4.0, -0.8}});
+        world_segments_.push_back({{-4.0,  0.8}, {4.0,  0.8}});
+
+        world_segments_.push_back({{-4.0, -0.8}, {-4.0, 0.8}});
+        world_segments_.push_back({{ 4.0, -0.8}, { 4.0, 0.8}});
+
+        world_segments_.push_back({{1.0, -0.2}, {1.0, 0.4}});
+    }
+
 
     Point2D compute_laser_world_position() const {
         const robot_sim::Pose pose = robot_.get_pose();
@@ -402,10 +478,11 @@ private:
             return true;
         }
 
-        const double elapsed = (stamp - last_scan_time_).seconds();
+        const auto scan_period = rclcpp::Duration::from_seconds(1.0 / scan_rate_hz_);
+        
 
-        if (elapsed >= 1.0 / scan_rate_hz_) {
-            last_scan_time_ = stamp;
+        if (stamp >= last_scan_time_ + scan_period) {
+            last_scan_time_ = last_scan_time_ + scan_period;
             return true;
         }
 
@@ -517,6 +594,9 @@ private:
     rclcpp::Duration command_timeout_;
 
     std::vector<Segment2D> world_segments_;
+    std::string world_name_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_publisher_;
+    visualization_msgs::msg::MarkerArray world_markers_;
 
     bool scan_noise_enabled_;
     double scan_noise_stddev_;

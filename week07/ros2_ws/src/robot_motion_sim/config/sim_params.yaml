@@ -26,3 +26,5 @@ robot_simulator_node:
 
     scan_noise_enabled: false
     scan_noise_stddev: 0.01
+
+    world_name: "corridor"

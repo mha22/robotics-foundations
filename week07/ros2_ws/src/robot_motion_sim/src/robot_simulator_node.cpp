@@ -367,8 +367,8 @@ private:
         world_segments_.push_back({{ 3.0,  2.0}, {-3.0,  2.0}});
         world_segments_.push_back({{-3.0,  2.0}, {-3.0, -2.0}});
 
-        world_segments_.push_back({{0.8, -0.8}, {0.8, 0.8}});
-        world_segments_.push_back({{-1.2, 0.5}, {-0.3, 0.5}});
+        // world_segments_.push_back({{0.8, -0.8}, {0.8, 0.8}});
+        // world_segments_.push_back({{-1.2, 0.5}, {-0.3, 0.5}});
     }
 
     void initialize_corridor() {

@@ -53,7 +53,7 @@ install(
 )
 
 install(
-  DIRECTORY launch config rviz urdf
+  DIRECTORY launch config rviz urdf maps
   DESTINATION share/${PROJECT_NAME}
 )
 

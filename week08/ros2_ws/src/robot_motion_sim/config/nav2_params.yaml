@@ -270,7 +270,7 @@ global_costmap:
 map_server:
   ros__parameters:
     use_sim_time: false
-    yaml_filename: "/home/mha/robotics-6-months/robotics-foundations/week08/ros2_ws/src/robot_motion_sim/maps/simple_room.yaml"
+    yaml_filename: "/home/mha/robotics-6-months/robotics-foundations/week08/ros2_ws/src/robot_motion_sim/maps/slam_room.yaml"
 
 map_saver:
   ros__parameters:

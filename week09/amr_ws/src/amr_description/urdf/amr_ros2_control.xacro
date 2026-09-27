@@ -6,12 +6,10 @@
     <ros2_control name="AMRSystem" type="system">
 
       <hardware>
-        <!-- For Gazebo Sim / gz sim -->
         <xacro:if value="${use_sim}">
           <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </xacro:if>
 
-        <!-- Placeholder for future real hardware -->
         <xacro:unless value="${use_sim}">
           <plugin>mock_components/GenericSystem</plugin>
         </xacro:unless>

@@ -1,58 +1,40 @@
-# AMR Control
+# AMR Gazebo Simulation
 
-ROS 2 Jazzy control package for a differential-drive AMR using `ros2_control`.
+ROS 2 Jazzy simulation setup for a differential-drive Autonomous Mobile Robot (AMR). This lesson connects the robot model to Gazebo Sim using `gz_ros2_control` and runs the wheel controllers inside the simulator.
 
 ## Features
 
-- Mock hardware with `mock_components/GenericSystem`
-- `joint_state_broadcaster`
-- `diff_drive_controller`
-- Velocity command input through `/cmd_vel`
-- Joint state publishing on `/joint_states`
-- Odometry publishing on `/odom`
-- `odom -> base_link` TF publishing
-- Controller configuration and launch files
+- Xacro-based robot description
+- Gazebo Sim integration through `gz_ros2_control`
+- `joint_state_broadcaster` and `diff_drive_controller`
+- Separate launch files for mock control and Gazebo simulation
 
 ## Build
 ```bash
 cd ~/amr_ws
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/jazzy/setup.zsh
 colcon build --symlink-install
-source install/setup.bash
+source install/setup.zsh
 ```
 
-## Launch
+## Run the Simulation
 
 ```bash
-ros2 launch amr_control control.launch.py
+ros2 launch amr_control simulation.launch.py
 ```
 
-The default configuration uses mock hardware:
-
-```bash
-ros2 launch amr_control control.launch.py use_sim:=false
-```
-
-## Verify Controllers
+## Verify
 
 ```bash
 ros2 control list_controllers
 ros2 control list_hardware_interfaces
-```
-
-## Test Topics
-
-```bash
 ros2 topic echo /joint_states
-ros2 topic echo /odom
-ros2 run tf2_ros tf2_echo odom base_link
+ros2 topic echo /diff_drive_controller/odom
 ```
 
-To send a velocity command:
+Send a forward velocity command:
 
 ```bash
-ros2 topic pub /diff_drive_controller/cmd_vel geometry_msgs/msg TwistStamped \
-"{header: {stamp: {sec: 0, nanosec: 0}, frame_id: ''}, twist: {linear: {x: 0.2, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}}" -r 10
+ ros2 topic pub -r 20 /diff_drive_controller/cmd_vel geometry_msgs/msg/TwistStamped \
+"{header: {stamp: {sec: 0, nanosec: 0}, frame_id: ''}, twist: {linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.6}}}"
 ```
-
-Gazebo integration will be added in the next lesson.

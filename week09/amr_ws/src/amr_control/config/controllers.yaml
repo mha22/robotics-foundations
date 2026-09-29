@@ -1,6 +1,7 @@
 controller_manager:
   ros__parameters:
     update_rate: 50
+    use_sim_time: true
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -10,6 +11,8 @@ controller_manager:
 
 diff_drive_controller:
   ros__parameters:
+    use_sim_time: true
+
     left_wheel_names: ["left_wheel_joint"]
     right_wheel_names: ["right_wheel_joint"]
 
@@ -26,7 +29,7 @@ diff_drive_controller:
     position_feedback: true
 
     cmd_vel_timeout: 0.5
-    use_stamped_vel: false
+    use_stamped_vel: true
 
     velocity_rolling_window_size: 10
 

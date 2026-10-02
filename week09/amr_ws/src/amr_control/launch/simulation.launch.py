@@ -41,6 +41,12 @@ def generate_launch_description():
         "gz_sim.launch.py",
     ])
 
+    world_file = PathJoinSubstitution([
+        description_pkg,
+        "worlds",
+        "simulation.sdf",
+    ])
+
     robot_description_content = Command([
         "xacro",
         " ",
@@ -65,7 +71,7 @@ def generate_launch_description():
     gazebo_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(gz_sim_launch_file),
         launch_arguments={
-            "gz_args": "-r empty.sdf",
+            "gz_args": ["-r ", world_file],
         }.items(),
     )
 
@@ -133,6 +139,15 @@ def generate_launch_description():
         output="screen",
     )
 
+    scan_bridge_node = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+        ],
+        output="screen",
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             "use_sim_time",
@@ -142,6 +157,7 @@ def generate_launch_description():
 
         gazebo_node,
         clock_bridge_node,
+        scan_bridge_node,
         robot_state_publisher_node,
 
         TimerAction(

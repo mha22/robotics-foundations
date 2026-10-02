@@ -1,37 +1,30 @@
-# AMR LiDAR Simulation
+# AMR LiDAR Visualization
 
-ROS 2 Jazzy Gazebo simulation for a differential-drive Autonomous Mobile Robot (AMR) equipped with a GPU LiDAR sensor.
+ROS 2 Jazzy Gazebo simulation for validating the LiDAR TF chain and visualizing `/scan` data in RViz.
 
-## Features
+## Verification
 
-- Gazebo Sim world with GPU LiDAR sensor support
-- Custom simulation world with physics, lighting, and ground plane
-- `gz_ros2_control` integration
-- Differential-drive controllers
-- ROS-Gazebo bridges for `/clock` and `/scan`
-- LiDAR data published on `/scan` using the `lidar_link` frame
-
-## Build
-
+Check the transform between `base_link` and `lidar_link`:
 ```bash
-cd ~/amr_ws
-source /opt/ros/jazzy/setup.zsh
-colcon build --symlink-install
-source install/setup.zsh
+ros2 run tf2_ros tf2_echo base_link lidar_link
 ```
 
-## Run
+Expected result:
+
+```text
+Translation: [0.000, 0.000, 0.285]
+Rotation: [0.000, 0.000, 0.000, 1.000]
+```
+Launch RViz:
 
 ```bash
-ros2 launch amr_control simulation.launch.py
+rviz2
 ```
 
-## Verify
+Set the `Fixed Frame` to `base_link` and add a `LaserScan` display for:
 
-```bash
-ros2 control list_controllers
-ros2 topic echo /scan --once
-gz topic -e -t /scan
+```text
+/scan
 ```
 
-The GPU LiDAR requires the Gazebo Sensors system plugin in the simulation world.
+In an empty world, the laser may not be visible because there are no nearby obstacles. After adding the `test_box` obstacle to `simulation.sdf`, the LiDAR scan became visible in RViz as expected.

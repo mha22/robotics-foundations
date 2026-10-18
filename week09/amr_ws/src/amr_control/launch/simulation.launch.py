@@ -96,6 +96,8 @@ def generate_launch_description():
             "joint_state_broadcaster",
             "--controller-manager",
             "/controller_manager",
+            "--param-file",
+            controllers_file,
             "--controller-manager-timeout",
             "60",
         ],
@@ -109,6 +111,8 @@ def generate_launch_description():
             "diff_drive_controller",
             "--controller-manager",
             "/controller_manager",
+            "--param-file",
+            controllers_file,
             "--controller-manager-timeout",
             "60",
         ],
@@ -133,6 +137,7 @@ def generate_launch_description():
     clock_bridge_node = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
+        name="clock_bridge",
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
         ],
@@ -142,6 +147,7 @@ def generate_launch_description():
     scan_bridge_node = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
+        name="scan_bridge",
         arguments=[
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
         ],
